@@ -9,20 +9,41 @@ export default defineConfig({
         VitePWA({
             registerType: 'autoUpdate',
             manifest: {
-                name: 'UniGov Platform',
-                short_name: 'UniGov',
-                description: 'Governance & communication plateforme',
-                theme_color: '#3b82f6',
+                name: 'EniGov - Excellence & Gouvernance',
+                short_name: 'EniGov',
+                description: 'Plateforme Premium de Gouvernance et Communication Étudiante de l\'ENICarthage',
+                theme_color: '#0066CC',
+                background_color: '#0066CC',
                 icons: [
+                    {
+                        src: 'favicon.svg',
+                        sizes: '192x192',
+                        type: 'image/svg+xml',
+                        purpose: 'any'
+                    },
                     {
                         src: 'logo-unigov-192.png',
                         sizes: '192x192',
-                        type: 'image/png'
+                        type: 'image/png',
+                        purpose: 'any'
+                    },
+                    {
+                        src: 'favicon.svg',
+                        sizes: '512x512',
+                        type: 'image/svg+xml',
+                        purpose: 'any'
                     },
                     {
                         src: 'logo-unigov-512.png',
                         sizes: '512x512',
-                        type: 'image/png'
+                        type: 'image/png',
+                        purpose: 'any'
+                    },
+                    {
+                        src: 'favicon.svg',
+                        sizes: '512x512',
+                        type: 'image/svg+xml',
+                        purpose: 'maskable'
                     }
                 ]
             }
