@@ -23,6 +23,6 @@ services:
       - key: FRONTEND_URL
         value: https://enigov.tn
       - key: FROM_EMAIL
-        value: noreply@enigov.tn
+        value: mouhib.fahem28@gmail.com
       - key: BREVO_API_KEY
         sync: false
