@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: enigov-backend
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /api-docs
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION
+        value: "86400000"
+      - key: ALLOWED_ORIGINS
+        value: https://enigov.tn,https://www.enigov.tn
+      - key: FRONTEND_URL
+        value: https://enigov.tn
+      - key: FROM_EMAIL
+        value: noreply@enigov.tn
+      - key: SMTP_USERNAME
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
