@@ -43,7 +43,7 @@ const MessagingPage = () => {
             // Auto-select first conversation if none active
             if (!activeContact && res.data.length > 0) {
                 const first = res.data[0];
-                setActiveContact({ id: first.otherUserId, name: first.otherUserName });
+                setActiveContact({ id: first.otherUserId, name: first.otherUserName, profilePhoto: first.profilePhoto });
                 fetchHistory(first.otherUserId);
             }
         } catch {
@@ -74,7 +74,8 @@ const MessagingPage = () => {
     const handleSelectContact = (contact) => {
         const id = contact.otherUserId || contact.id;
         const name = contact.otherUserName || contact.fullName || contact.name;
-        setActiveContact({ id, name });
+        const profilePhoto = contact.profilePhoto;
+        setActiveContact({ id, name, profilePhoto });
         fetchHistory(id);
         setIsStartingNew(false);
         setSearchQuery('');
@@ -100,6 +101,24 @@ const MessagingPage = () => {
     };
 
     const isActive = (contactId) => activeContact?.id === contactId;
+
+    const renderAvatar = (name, profilePhoto, size = 'w-10 h-10', rounded = 'rounded-xl', colorClass = 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400') => {
+        if (profilePhoto) {
+            const src = profilePhoto.startsWith('http') 
+                ? profilePhoto 
+                : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8081'}/uploads/${profilePhoto}`;
+            return (
+                <div className={`${size} ${rounded} overflow-hidden shrink-0`}>
+                    <img src={src} alt={name} className="w-full h-full object-cover" />
+                </div>
+            );
+        }
+        return (
+            <div className={`${size} ${colorClass} ${rounded} flex items-center justify-center font-bold uppercase shrink-0`}>
+                {(name || '?').charAt(0)}
+            </div>
+        );
+    };
 
     return (
         <DashboardLayout title="Messagerie">
@@ -148,9 +167,7 @@ const MessagingPage = () => {
                                             onClick={() => handleSelectContact(c)}
                                             className="p-3 mx-1 flex items-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg transition-all"
                                         >
-                                            <div className="w-9 h-9 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-xs uppercase">
-                                                {(c.fullName || '?').charAt(0)}
-                                            </div>
+                                            {renderAvatar(c.fullName, c.profilePhoto, 'w-9 h-9', 'rounded-lg', 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 text-xs')}
                                             <div>
                                                 <p className="font-semibold text-sm text-slate-800 dark:text-white">{c.fullName}</p>
                                                 <p className="text-[10px] text-slate-400">{(c.role || '').replace('ROLE_', '')}</p>
@@ -174,9 +191,7 @@ const MessagingPage = () => {
                                                 : 'border-l-4 border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50'
                                         }`}
                                     >
-                                        <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold uppercase shrink-0">
-                                            {(c.otherUserName || '?').charAt(0)}
-                                        </div>
+                                        {renderAvatar(c.otherUserName, c.profilePhoto, 'w-10 h-10', 'rounded-xl', 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400')}
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center justify-between mb-0.5">
                                                 <span className="font-semibold text-sm text-slate-800 dark:text-white truncate">{c.otherUserName}</span>
@@ -227,9 +242,7 @@ const MessagingPage = () => {
                         <>
                             {/* Chat header */}
                             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
-                                <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white font-bold uppercase">
-                                    {(activeContact.name || '?').charAt(0)}
-                                </div>
+                                {renderAvatar(activeContact.name, activeContact.profilePhoto, 'w-10 h-10', 'rounded-xl', 'bg-primary-600 text-white')}
                                 <div>
                                     <h4 className="font-bold text-slate-800 dark:text-white text-sm">{activeContact.name}</h4>
                                     <span className="text-[10px] text-slate-400">Conversation privée</span>

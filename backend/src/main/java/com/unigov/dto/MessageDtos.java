@@ -48,6 +48,7 @@ public class MessageDtos {
         private String lastMessage;
         private LocalDateTime lastTimestamp;
         private long unreadCount;
+        private String profilePhoto;
 
         public String getOtherUserId() { return otherUserId; }
         public void setOtherUserId(String otherUserId) { this.otherUserId = otherUserId; }
@@ -59,12 +60,15 @@ public class MessageDtos {
         public void setLastTimestamp(LocalDateTime lastTimestamp) { this.lastTimestamp = lastTimestamp; }
         public long getUnreadCount() { return unreadCount; }
         public void setUnreadCount(long unreadCount) { this.unreadCount = unreadCount; }
+        public String getProfilePhoto() { return profilePhoto; }
+        public void setProfilePhoto(String profilePhoto) { this.profilePhoto = profilePhoto; }
     }
 
     public static class ContactResponse {
         private String id;
         private String fullName;
         private String role;
+        private String profilePhoto;
 
         public String getId() { return id; }
         public void setId(String id) { this.id = id; }
@@ -72,5 +76,7 @@ public class MessageDtos {
         public void setFullName(String fullName) { this.fullName = fullName; }
         public String getRole() { return role; }
         public void setRole(String role) { this.role = role; }
+        public String getProfilePhoto() { return profilePhoto; }
+        public void setProfilePhoto(String profilePhoto) { this.profilePhoto = profilePhoto; }
     }
 }

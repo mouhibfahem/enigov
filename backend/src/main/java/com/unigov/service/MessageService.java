@@ -115,6 +115,7 @@ public class MessageService {
             conv.setLastMessage(lastMsg.getContent());
             conv.setLastTimestamp(lastMsg.getTimestamp());
             conv.setUnreadCount(unreadCount);
+            userRepository.findById(otherId).ifPresent(u -> conv.setProfilePhoto(u.getProfilePhoto()));
             conversations.add(conv);
         }
 
@@ -143,6 +144,7 @@ public class MessageService {
             c.setId(u.getId());
             c.setFullName(u.getFullName());
             c.setRole(u.getRole() != null ? u.getRole().name() : "ROLE_ETUDIANT");
+            c.setProfilePhoto(u.getProfilePhoto());
             return c;
         }).collect(Collectors.toList());
     }
