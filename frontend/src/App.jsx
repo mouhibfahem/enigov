@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import StudentHomePage from './pages/StudentHomePage';
@@ -46,7 +47,8 @@ const PageTransition = ({ children }) => (
 
 const HomePage = () => {
     const { user } = useAuth();
-    if (user?.role === 'ROLE_DELEGUE') return <DelegateDashboard />;
+    if (!user) return <LandingPage />;
+    if (user.role === 'ROLE_DELEGUE') return <DelegateDashboard />;
     return <StudentHomePage />;
 };
 
@@ -62,11 +64,9 @@ const AnimatedRoutes = () => {
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-                {/* Home — role-based */}
+                {/* Home — public landing for guests, role-based dashboard for authed users */}
                 <Route path="/" element={
-                    <ProtectedRoute>
-                        <PageTransition><HomePage /></PageTransition>
-                    </ProtectedRoute>
+                    <PageTransition><HomePage /></PageTransition>
                 } />
 
                 {/* Protected routes */}
