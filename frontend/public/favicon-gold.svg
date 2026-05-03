@@ -1,0 +1,45 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gold Gradient for Temple and Text -->
+    <linearGradient id="gold_metallic" x1="256" y1="50" x2="256" y2="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="50%" stop-color="#EAB308"/>
+      <stop offset="100%" stop-color="#854D0E"/>
+    </linearGradient>
+    
+    <filter id="soft_glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Premium Deep Blue Background -->
+  <rect width="512" height="512" rx="128" fill="#003366"/>
+  
+  <!-- Subtle Inner Border -->
+  <rect x="15" y="15" width="482" height="482" rx="113" stroke="white" stroke-opacity="0.1" stroke-width="2"/>
+
+  <g filter="url(#soft_glow)">
+    <!-- 1. The 'EniGov' Text Above the Logo -->
+    <text x="256" y="140" text-anchor="middle" fill="url(#gold_metallic)" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 80px; letter-spacing: 2px;">ENIGOV</text>
+
+    <!-- 2. The Governance Temple Below the Text -->
+    <g transform="translate(256, 300)">
+      <!-- Pediment (Roof) -->
+      <path d="M-130 -60L0 -120L130 -60V-45H-130V-60Z" fill="url(#gold_metallic)"/>
+      <circle cx="0" cy="-85" r="10" fill="white" fill-opacity="0.9"/>
+
+      <!-- Pillars -->
+      <rect x="-95" y="-35" width="25" height="120" rx="4" fill="url(#gold_metallic)"/>
+      <rect x="-12" y="-35" width="24" height="120" rx="4" fill="url(#gold_metallic)"/>
+      <rect x="70" y="-35" width="25" height="120" rx="4" fill="url(#gold_metallic)"/>
+      
+      <!-- Base -->
+      <rect x="-150" y="85" width="300" height="25" rx="4" fill="url(#gold_metallic)"/>
+      <rect x="-165" y="110" width="330" height="15" rx="4" fill="#854D0E"/>
+    </g>
+  </g>
+
+  <!-- Premium Glass Reflection -->
+  <path d="M128 0H384C454.69 0 512 57.31 512 128V160C256 120 0 160 0 160V128C0 57.31 57.31 0 128 0Z" fill="white" fill-opacity="0.05"/>
+</svg>
