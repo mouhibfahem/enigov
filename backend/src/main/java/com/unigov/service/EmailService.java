@@ -1,16 +1,26 @@
 package com.unigov.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private static final String BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
+
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${enigov.app.frontendUrl}")
     private String frontendUrl;
@@ -18,15 +28,16 @@ public class EmailService {
     @Value("${enigov.app.fromEmail}")
     private String fromEmail;
 
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
+    @Value("${enigov.app.fromName:EniGov}")
+    private String fromName;
+
+    @Value("${BREVO_API_KEY:}")
+    private String brevoApiKey;
 
     public void sendVerificationEmail(String to, String fullName, String token) {
         String subject = "EniGov — Vérifiez votre adresse email";
         String verifyUrl = frontendUrl + "/verify-email?token=" + token;
 
-        // Fallback: Log the link to the console in case SMTP fails
         System.out.println("=================================================");
         System.out.println("LIEN DE VÉRIFICATION POUR " + fullName + " :");
         System.out.println(verifyUrl);
@@ -35,7 +46,7 @@ public class EmailService {
         String html = """
                 <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 32px; background: #f8fafc; border-radius: 16px;">
                     <div style="text-align: center; margin-bottom: 24px;">
-                        <h1 style="color: #1e293b; font-size: 24px; margin: 0;">🎓 EniGov</h1>
+                        <h1 style="color: #1e293b; font-size: 24px; margin: 0;">EniGov</h1>
                         <p style="color: #64748b; font-size: 14px; margin-top: 4px;">Plateforme de gouvernance étudiante</p>
                     </div>
                     <div style="background: white; border-radius: 12px; padding: 24px; border: 1px solid #e2e8f0;">
@@ -55,7 +66,7 @@ public class EmailService {
                 </div>
                 """.formatted(fullName, verifyUrl);
 
-        sendHtmlEmail(to, subject, html);
+        sendEmail(to, subject, html);
     }
 
     public void sendPasswordResetEmail(String to, String fullName, String token) {
@@ -65,7 +76,7 @@ public class EmailService {
         String html = """
                 <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 32px; background: #f8fafc; border-radius: 16px;">
                     <div style="text-align: center; margin-bottom: 24px;">
-                        <h1 style="color: #1e293b; font-size: 24px; margin: 0;">🎓 EniGov</h1>
+                        <h1 style="color: #1e293b; font-size: 24px; margin: 0;">EniGov</h1>
                         <p style="color: #64748b; font-size: 14px; margin-top: 4px;">Plateforme de gouvernance étudiante</p>
                     </div>
                     <div style="background: white; border-radius: 12px; padding: 24px; border: 1px solid #e2e8f0;">
@@ -85,23 +96,46 @@ public class EmailService {
                 </div>
                 """.formatted(fullName, resetUrl);
 
-        sendHtmlEmail(to, subject, html);
+        sendEmail(to, subject, html);
     }
 
-    private void sendHtmlEmail(String to, String subject, String htmlContent) {
-        System.out.println("[MAIL] Attempting send: to=" + to + " from=" + fromEmail);
+    private void sendEmail(String to, String subject, String htmlContent) {
+        if (brevoApiKey == null || brevoApiKey.isBlank()) {
+            System.err.println("[MAIL] BREVO_API_KEY not set — skipping send (link only printed to log)");
+            return;
+        }
+
+        System.out.println("[MAIL] Sending via Brevo HTTP API: to=" + to + " from=" + fromEmail);
+
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlContent, true);
-            mailSender.send(message);
-            System.out.println("[MAIL] Send SUCCESS to=" + to);
+            String body = objectMapper.writeValueAsString(Map.of(
+                    "sender", Map.of("name", fromName, "email", fromEmail),
+                    "to", List.of(Map.of("email", to)),
+                    "subject", subject,
+                    "htmlContent", htmlContent
+            ));
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BREVO_API_URL))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("api-key", brevoApiKey)
+                    .header("Content-Type", "application/json")
+                    .header("accept", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                System.out.println("[MAIL] Send SUCCESS to=" + to + " status=" + response.statusCode() + " body=" + response.body());
+            } else {
+                System.err.println("[MAIL] Send FAILED to=" + to + " status=" + response.statusCode() + " body=" + response.body());
+                throw new RuntimeException("Brevo API returned " + response.statusCode() + ": " + response.body());
+            }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             System.err.println("[MAIL] Send FAILED to=" + to + " : " + e.getClass().getSimpleName() + " - " + e.getMessage());
-            e.printStackTrace();
             throw new RuntimeException("Erreur lors de l'envoi de l'email : " + e.getMessage(), e);
         }
     }
