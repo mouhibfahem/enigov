@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private static final String ALLOWED_EMAIL_DOMAIN = "@enicar.ucar.tn";
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final long LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
     private static final long RESET_TOKEN_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
@@ -48,6 +47,9 @@ public class AuthController {
 
     @Autowired
     EmailService emailService;
+
+    @org.springframework.beans.factory.annotation.Value("${enigov.app.allowedEmailDomain:@enicar.ucar.tn}")
+    private String allowedEmailDomain;
 
     // ==================== LOGIN ====================
 
@@ -128,9 +130,9 @@ public class AuthController {
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         // Validate email domain
         String email = signUpRequest.getEmail();
-        if (email == null || !email.toLowerCase().endsWith(ALLOWED_EMAIL_DOMAIN)) {
+        if (email == null || (!allowedEmailDomain.isBlank() && !email.toLowerCase().endsWith(allowedEmailDomain))) {
             return ResponseEntity.badRequest()
-                    .body(new MessageResponse("Erreur : Seuls les emails @enicar.ucar.tn sont acceptés."));
+                    .body(new MessageResponse("Erreur : Seuls les emails " + allowedEmailDomain + " sont acceptés."));
         }
 
         // Validate password strength
