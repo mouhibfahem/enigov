@@ -89,6 +89,7 @@ public class EmailService {
     }
 
     private void sendHtmlEmail(String to, String subject, String htmlContent) {
+        System.out.println("[MAIL] Attempting send: to=" + to + " from=" + fromEmail);
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -97,7 +98,10 @@ public class EmailService {
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
             mailSender.send(message);
-        } catch (MessagingException e) {
+            System.out.println("[MAIL] Send SUCCESS to=" + to);
+        } catch (Exception e) {
+            System.err.println("[MAIL] Send FAILED to=" + to + " : " + e.getClass().getSimpleName() + " - " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Erreur lors de l'envoi de l'email : " + e.getMessage(), e);
         }
     }
