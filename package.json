@@ -2,13 +2,16 @@
     "name": "unigov-monorepo",
     "version": "1.0.0",
     "private": true,
+    "workspaces": [
+        "frontend"
+    ],
     "scripts": {
-        "build": "cd frontend && npm install && npm run build",
-        "vercel-build": "cd frontend && npm install && npm run build",
-        "frontend:dev": "cd frontend && npm run dev",
-        "frontend:build": "cd frontend && npm run build",
+        "build": "npm run build --workspace=frontend",
+        "vercel-build": "npm run build --workspace=frontend",
+        "frontend:dev": "npm run dev --workspace=frontend",
+        "frontend:build": "npm run build --workspace=frontend",
         "backend:dev": "mvn -f backend/pom.xml spring-boot:run",
         "backend:build": "mvn -f backend/pom.xml clean install",
-        "install:all": "cd frontend && npm install && cd .. && mvn -f backend/pom.xml install -DskipTests"
+        "install:all": "npm install && mvn -f backend/pom.xml install -DskipTests"
     }
 }
