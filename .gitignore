@@ -1,0 +1,64 @@
+# ===========================
+# SECRETS — NEVER COMMIT THESE
+# ===========================
+.env
+*.env
+.env.local
+.env.production
+
+# ===========================
+# UPLOADED FILES
+# ===========================
+backend/uploads/
+
+# ===========================
+# JAVA / MAVEN
+# ===========================
+*.class
+*.log
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.properties
+
+# ===========================
+# NODE / REACT / VITE
+# ===========================
+node_modules/
+dist/
+coverage/
+.vite/
+*.local
+
+# ===========================
+# IDEs
+# ===========================
+.idea/
+*.iml
+.vscode/
+*.classpath
+*.project
+*.settings/
+.DS_Store
+Thumbs.db
+
+# ===========================
+# MISC
+# ===========================
+.gradle/
+build/
+data/
