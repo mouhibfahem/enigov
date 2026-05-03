@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"C:\\\\Users\\\\mouhi\\\\OneDrive\\\\Desktop\\\\UniGov-fresh-main\\\\backend\\\\src\\\\main\\\\resources\")",
+      "Bash(ls \"C:\\\\Users\\\\mouhi\\\\OneDrive\\\\Desktop\\\\UniGov-fresh-main\\\\backend\\\\src\\\\main\\\\java\")",
+      "Bash(ls \"C:\\\\Users\\\\mouhi\\\\OneDrive\\\\Desktop\\\\UniGov-fresh-main\\\\backend\" -la)",
+      "Bash(ls \"C:\\\\Users\\\\mouhi\\\\OneDrive\\\\Desktop\\\\UniGov-fresh-main\\\\frontend\\\\src\")",
+      "Bash(git *)",
+      "Bash(xargs grep *)"
+    ]
+  }
+}
