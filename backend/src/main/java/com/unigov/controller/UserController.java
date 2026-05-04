@@ -55,6 +55,8 @@ public class UserController {
         response.put("fullName", user.getFullName());
         response.put("role", user.getRole());
         response.put("profilePhoto", user.getProfilePhoto());
+        response.put("filiere", user.getFiliere() != null ? user.getFiliere().name() : null);
+        response.put("promotion", user.getPromotion() != null ? user.getPromotion().name() : null);
 
         return ResponseEntity.ok(response);
     }

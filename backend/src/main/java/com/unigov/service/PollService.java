@@ -1,9 +1,13 @@
 package com.unigov.service;
 
 import com.unigov.dto.PollDtos.*;
+import com.unigov.dto.TargetAudienceDto;
+import com.unigov.entity.Filiere;
 import com.unigov.entity.Notification.NotificationType;
 import com.unigov.entity.Poll;
 import com.unigov.entity.PollOption;
+import com.unigov.entity.Promotion;
+import com.unigov.entity.Role;
 import com.unigov.entity.User;
 import com.unigov.repository.PollRepository;
 import com.unigov.repository.UserRepository;
@@ -41,6 +45,28 @@ public class PollService {
         poll.setCreatorId(creator.getId());
         poll.setCreatorName(creator.getFullName());
 
+        // Parse target audience
+        TargetAudienceDto ta = request.getTargetAudience();
+        if (ta != null && !ta.isTargetAll()) {
+            poll.setTargetAll(false);
+            if (ta.getFilieres() != null) {
+                Set<Filiere> filieres = new HashSet<>();
+                for (String f : ta.getFilieres()) {
+                    try { filieres.add(Filiere.valueOf(f.toUpperCase())); } catch (Exception ignored) {}
+                }
+                poll.setTargetFilieres(filieres);
+            }
+            if (ta.getPromotions() != null) {
+                Set<Promotion> promotions = new HashSet<>();
+                for (String p : ta.getPromotions()) {
+                    try { promotions.add(Promotion.valueOf(p.toUpperCase())); } catch (Exception ignored) {}
+                }
+                poll.setTargetPromotions(promotions);
+            }
+        } else {
+            poll.setTargetAll(true);
+        }
+
         List<String> requestedOptions = request.getOptions();
         List<PollOption> options = new ArrayList<>();
         for (int i = 0; i < requestedOptions.size(); i++) {
@@ -53,7 +79,11 @@ public class PollService {
 
         Poll saved = pollRepository.save(poll);
 
-        notificationService.notifyAllStudents(
+        // Send targeted notifications
+        notificationService.notifyTargetedStudents(
+                saved.isTargetAll(),
+                saved.getTargetFilieres(),
+                saved.getTargetPromotions(),
                 NotificationType.NEW_POLL,
                 "Nouveau sondage : " + saved.getQuestion(),
                 saved.getId()
@@ -66,8 +96,20 @@ public class PollService {
     public List<PollResponse> getAllPolls(String username, boolean isDelegue) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-        return pollRepository.findAllByOrderByCreatedAtDesc().stream()
-                .map(p -> mapToResponse(p, user.getId(), isDelegue))
+
+        List<Poll> all = pollRepository.findAllByOrderByCreatedAtDesc();
+
+        // Delegates see everything
+        if (isDelegue) {
+            return all.stream()
+                    .map(p -> mapToResponse(p, user.getId(), true))
+                    .collect(Collectors.toList());
+        }
+
+        // Students see only polls targeted to them
+        return all.stream()
+                .filter(p -> p.isVisibleTo(user.getFiliere(), user.getPromotion()))
+                .map(p -> mapToResponse(p, user.getId(), false))
                 .collect(Collectors.toList());
     }
 
@@ -171,6 +213,14 @@ public class PollService {
         response.setDeadline(poll.getDeadline());
         response.setTotalVotes(totalVotes);
         response.setCreatedAt(poll.getCreatedAt());
+        response.setTargetAll(poll.isTargetAll());
+        response.setTargetFilieres(poll.getTargetFilieres().stream()
+                .map(Enum::name)
+                .collect(Collectors.toList()));
+        response.setTargetPromotions(poll.getTargetPromotions().stream()
+                .map(Enum::name)
+                .collect(Collectors.toList()));
+        response.setTargetLabel(buildTargetLabel(poll));
 
         if (currentUserId != null) {
             response.setUserVoted(poll.hasUserVoted(currentUserId));
@@ -180,5 +230,23 @@ public class PollService {
         }
 
         return response;
+    }
+
+    private String buildTargetLabel(Poll p) {
+        if (p.isTargetAll()) return "Toutes les filières";
+
+        StringBuilder sb = new StringBuilder();
+        if (!p.getTargetFilieres().isEmpty()) {
+            sb.append(p.getTargetFilieres().stream()
+                    .map(Filiere::getDisplayName)
+                    .collect(Collectors.joining(", ")));
+        }
+        if (!p.getTargetPromotions().isEmpty()) {
+            if (sb.length() > 0) sb.append(" · ");
+            sb.append(p.getTargetPromotions().stream()
+                    .map(Promotion::getDisplayName)
+                    .collect(Collectors.joining(", ")));
+        }
+        return sb.length() > 0 ? sb.toString() : "Toutes les filières";
     }
 }

@@ -1,6 +1,8 @@
 package com.unigov.controller;
 
 import com.unigov.entity.ComplaintEnums.ComplaintStatus;
+import com.unigov.entity.Filiere;
+import com.unigov.entity.Promotion;
 import com.unigov.entity.Role;
 import com.unigov.entity.User;
 import com.unigov.repository.*;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
@@ -52,6 +55,20 @@ public class StatsController {
         // User stats
         long totalStudents = userRepository.findByRole(Role.ROLE_ETUDIANT).size();
         stats.put("totalStudents", totalStudents);
+
+        // Filiere breakdown
+        Map<String, Long> filiereStats = new LinkedHashMap<>();
+        for (Filiere f : Filiere.values()) {
+            filiereStats.put(f.name(), userRepository.countByFiliere(f));
+        }
+        stats.put("studentsByFiliere", filiereStats);
+
+        // Promotion breakdown
+        Map<String, Long> promotionStats = new LinkedHashMap<>();
+        for (Promotion p : Promotion.values()) {
+            promotionStats.put(p.name(), userRepository.countByPromotion(p));
+        }
+        stats.put("studentsByPromotion", promotionStats);
 
         // Complaint stats
         var allComplaints = complaintRepository.findAll();

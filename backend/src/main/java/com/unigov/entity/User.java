@@ -47,6 +47,14 @@ public class User {
     @Column(length = 32)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private Filiere filiere;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private Promotion promotion;
+
     private String fullName;
 
     private String profilePhoto;
@@ -94,6 +102,12 @@ public class User {
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+
+    public Filiere getFiliere() { return filiere; }
+    public void setFiliere(Filiere filiere) { this.filiere = filiere; }
+
+    public Promotion getPromotion() { return promotion; }
+    public void setPromotion(Promotion promotion) { this.promotion = promotion; }
 
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }

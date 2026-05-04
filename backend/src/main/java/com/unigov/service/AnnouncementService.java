@@ -2,7 +2,10 @@ package com.unigov.service;
 
 import com.unigov.dto.AnnouncementDtos.*;
 import com.unigov.entity.Announcement;
+import com.unigov.entity.Filiere;
 import com.unigov.entity.Notification.NotificationType;
+import com.unigov.entity.Promotion;
+import com.unigov.entity.Role;
 import com.unigov.entity.User;
 import com.unigov.repository.AnnouncementRepository;
 import com.unigov.repository.UserRepository;
@@ -10,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +33,11 @@ public class AnnouncementService {
     @Value("${file.upload-dir:uploads}")
     private String uploadDir;
 
-    public AnnouncementResponse createAnnouncement(AnnouncementRequest request, String username, String attachmentPath) {
+    public AnnouncementResponse createAnnouncement(AnnouncementRequest request, String username,
+                                                     String attachmentPath,
+                                                     boolean targetAll,
+                                                     Set<Filiere> targetFilieres,
+                                                     Set<Promotion> targetPromotions) {
         User delegate = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
@@ -38,10 +47,17 @@ public class AnnouncementService {
         announcement.setDelegateId(delegate.getId());
         announcement.setDelegateName(delegate.getFullName());
         announcement.setAttachmentPath(attachmentPath);
+        announcement.setTargetAll(targetAll);
+        announcement.setTargetFilieres(targetFilieres != null ? targetFilieres : new HashSet<>());
+        announcement.setTargetPromotions(targetPromotions != null ? targetPromotions : new HashSet<>());
 
         Announcement saved = announcementRepository.save(announcement);
 
-        notificationService.notifyAllStudents(
+        // Send targeted notifications
+        notificationService.notifyTargetedStudents(
+                targetAll,
+                saved.getTargetFilieres(),
+                saved.getTargetPromotions(),
                 NotificationType.NEW_ANNOUNCEMENT,
                 "Nouvelle annonce : " + saved.getTitle(),
                 saved.getId()
@@ -50,8 +66,20 @@ public class AnnouncementService {
         return mapToResponse(saved);
     }
 
-    public List<AnnouncementResponse> getAllAnnouncements() {
-        return announcementRepository.findAllByOrderByCreatedAtDesc().stream()
+    public List<AnnouncementResponse> getAllAnnouncements(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        List<Announcement> all = announcementRepository.findAllByOrderByCreatedAtDesc();
+
+        // Delegates see everything
+        if (user.getRole() == Role.ROLE_DELEGUE) {
+            return all.stream().map(this::mapToResponse).collect(Collectors.toList());
+        }
+
+        // Students see only announcements targeted to them
+        return all.stream()
+                .filter(a -> a.isVisibleTo(user.getFiliere(), user.getPromotion()))
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -86,6 +114,32 @@ public class AnnouncementService {
         response.setAttachmentPath(a.getAttachmentPath());
         response.setDelegateName(a.getDelegateName());
         response.setCreatedAt(a.getCreatedAt());
+        response.setTargetAll(a.isTargetAll());
+        response.setTargetFilieres(a.getTargetFilieres().stream()
+                .map(Enum::name)
+                .collect(Collectors.toList()));
+        response.setTargetPromotions(a.getTargetPromotions().stream()
+                .map(Enum::name)
+                .collect(Collectors.toList()));
+        response.setTargetLabel(buildTargetLabel(a));
         return response;
+    }
+
+    private String buildTargetLabel(Announcement a) {
+        if (a.isTargetAll()) return "Toutes les filières";
+
+        StringBuilder sb = new StringBuilder();
+        if (!a.getTargetFilieres().isEmpty()) {
+            sb.append(a.getTargetFilieres().stream()
+                    .map(Filiere::getDisplayName)
+                    .collect(Collectors.joining(", ")));
+        }
+        if (!a.getTargetPromotions().isEmpty()) {
+            if (sb.length() > 0) sb.append(" · ");
+            sb.append(a.getTargetPromotions().stream()
+                    .map(Promotion::getDisplayName)
+                    .collect(Collectors.joining(", ")));
+        }
+        return sb.length() > 0 ? sb.toString() : "Toutes les filières";
     }
 }

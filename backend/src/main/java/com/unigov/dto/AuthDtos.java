@@ -44,6 +44,10 @@ public class AuthDtos {
         @NotBlank
         private String fullName;
 
+        private String filiere;
+
+        private String promotion;
+
         public String getEmail() {
             return email;
         }
@@ -67,6 +71,22 @@ public class AuthDtos {
         public void setFullName(String fullName) {
             this.fullName = fullName;
         }
+
+        public String getFiliere() {
+            return filiere;
+        }
+
+        public void setFiliere(String filiere) {
+            this.filiere = filiere;
+        }
+
+        public String getPromotion() {
+            return promotion;
+        }
+
+        public void setPromotion(String promotion) {
+            this.promotion = promotion;
+        }
     }
 
     public static class JwtResponse {
@@ -78,9 +98,11 @@ public class AuthDtos {
         private String role;
         private String fullName;
         private String profilePhoto;
+        private String filiere;
+        private String promotion;
 
         public JwtResponse(String accessToken, String id, String username, String email, String role, String fullName,
-                String profilePhoto) {
+                String profilePhoto, String filiere, String promotion) {
             this.token = accessToken;
             this.id = id;
             this.username = username;
@@ -88,6 +110,8 @@ public class AuthDtos {
             this.role = role;
             this.fullName = fullName;
             this.profilePhoto = profilePhoto;
+            this.filiere = filiere;
+            this.promotion = promotion;
         }
 
         public String getToken() {
@@ -152,6 +176,22 @@ public class AuthDtos {
 
         public void setProfilePhoto(String profilePhoto) {
             this.profilePhoto = profilePhoto;
+        }
+
+        public String getFiliere() {
+            return filiere;
+        }
+
+        public void setFiliere(String filiere) {
+            this.filiere = filiere;
+        }
+
+        public String getPromotion() {
+            return promotion;
+        }
+
+        public void setPromotion(String promotion) {
+            this.promotion = promotion;
         }
     }
 

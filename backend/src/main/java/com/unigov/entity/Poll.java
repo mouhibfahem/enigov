@@ -1,12 +1,17 @@
 package com.unigov.entity;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
@@ -14,7 +19,9 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "polls")
@@ -41,6 +48,21 @@ public class Poll {
     private String creatorName;
 
     @Column(nullable = false)
+    private boolean targetAll = true;
+
+    @ElementCollection(targetClass = Filiere.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "poll_target_filieres", joinColumns = @JoinColumn(name = "poll_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "filiere")
+    private Set<Filiere> targetFilieres = new HashSet<>();
+
+    @ElementCollection(targetClass = Promotion.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "poll_target_promotions", joinColumns = @JoinColumn(name = "poll_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "promotion")
+    private Set<Promotion> targetPromotions = new HashSet<>();
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     public Poll() {
@@ -61,6 +83,12 @@ public class Poll {
     public void setCreatorId(String creatorId) { this.creatorId = creatorId; }
     public String getCreatorName() { return creatorName; }
     public void setCreatorName(String creatorName) { this.creatorName = creatorName; }
+    public boolean isTargetAll() { return targetAll; }
+    public void setTargetAll(boolean targetAll) { this.targetAll = targetAll; }
+    public Set<Filiere> getTargetFilieres() { return targetFilieres; }
+    public void setTargetFilieres(Set<Filiere> targetFilieres) { this.targetFilieres = targetFilieres; }
+    public Set<Promotion> getTargetPromotions() { return targetPromotions; }
+    public void setTargetPromotions(Set<Promotion> targetPromotions) { this.targetPromotions = targetPromotions; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
@@ -80,4 +108,14 @@ public class Poll {
         }
         return -1;
     }
+
+    public boolean isVisibleTo(Filiere userFiliere, Promotion userPromotion) {
+        if (targetAll) return true;
+        if (userFiliere == null && userPromotion == null) return true;
+
+        boolean filiereMatch = targetFilieres.isEmpty() || (userFiliere != null && targetFilieres.contains(userFiliere));
+        boolean promotionMatch = targetPromotions.isEmpty() || (userPromotion != null && targetPromotions.contains(userPromotion));
+        return filiereMatch && promotionMatch;
+    }
 }
+

@@ -200,6 +200,23 @@ const SettingsPage = () => {
                                         <h3 className="text-xl font-bold text-slate-800 dark:text-white">{user?.fullName}</h3>
                                         <p className="text-slate-500 font-medium">{user?.role === 'ROLE_DELEGUE' ? 'Délégué' : 'Étudiant'}</p>
                                         <p className="text-sm text-slate-400 mt-0.5">{user?.email}</p>
+                                        {user?.filiere && (
+                                            <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400">
+                                                    {user.filiere === 'INFO' ? '💻 Informatique' :
+                                                     user.filiere === 'INFOTRO' ? '🔌 Infotronique' :
+                                                     user.filiere === 'MECA' ? '⚙️ Mécatronique' :
+                                                     user.filiere === 'GSIL' ? '🏭 GSIL' : user.filiere}
+                                                </span>
+                                                {user?.promotion && (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                                                        {user.promotion === 'PREMIERE_ANNEE' ? '1ère année' :
+                                                         user.promotion === 'DEUXIEME_ANNEE' ? '2ème année' :
+                                                         user.promotion === 'TROISIEME_ANNEE' ? '3ème année' : user.promotion}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 

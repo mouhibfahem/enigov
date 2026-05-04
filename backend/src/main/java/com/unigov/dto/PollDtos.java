@@ -9,6 +9,7 @@ public class PollDtos {
         private String question;
         private List<String> options;
         private LocalDateTime deadline;
+        private TargetAudienceDto targetAudience;
 
         public String getQuestion() { return question; }
         public void setQuestion(String question) { this.question = question; }
@@ -16,6 +17,8 @@ public class PollDtos {
         public void setOptions(List<String> options) { this.options = options; }
         public LocalDateTime getDeadline() { return deadline; }
         public void setDeadline(LocalDateTime deadline) { this.deadline = deadline; }
+        public TargetAudienceDto getTargetAudience() { return targetAudience; }
+        public void setTargetAudience(TargetAudienceDto targetAudience) { this.targetAudience = targetAudience; }
     }
 
     public static class VoteRequest {
@@ -35,6 +38,10 @@ public class PollDtos {
         private boolean userVoted;
         private int userVotedOptionIndex; // -1 if not voted
         private LocalDateTime createdAt;
+        private boolean targetAll;
+        private List<String> targetFilieres;
+        private List<String> targetPromotions;
+        private String targetLabel;
 
         public String getId() { return id; }
         public void setId(String id) { this.id = id; }
@@ -54,6 +61,14 @@ public class PollDtos {
         public void setUserVotedOptionIndex(int userVotedOptionIndex) { this.userVotedOptionIndex = userVotedOptionIndex; }
         public LocalDateTime getCreatedAt() { return createdAt; }
         public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+        public boolean isTargetAll() { return targetAll; }
+        public void setTargetAll(boolean targetAll) { this.targetAll = targetAll; }
+        public List<String> getTargetFilieres() { return targetFilieres; }
+        public void setTargetFilieres(List<String> targetFilieres) { this.targetFilieres = targetFilieres; }
+        public List<String> getTargetPromotions() { return targetPromotions; }
+        public void setTargetPromotions(List<String> targetPromotions) { this.targetPromotions = targetPromotions; }
+        public String getTargetLabel() { return targetLabel; }
+        public void setTargetLabel(String targetLabel) { this.targetLabel = targetLabel; }
     }
 
     public static class OptionResponse {

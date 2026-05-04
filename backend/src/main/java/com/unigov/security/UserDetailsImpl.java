@@ -1,6 +1,8 @@
 package com.unigov.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.unigov.entity.Filiere;
+import com.unigov.entity.Promotion;
 import com.unigov.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,11 +22,13 @@ public class UserDetailsImpl implements UserDetails {
 
     private String fullName;
     private String profilePhoto;
+    private Filiere filiere;
+    private Promotion promotion;
 
     private Collection<? extends GrantedAuthority> authorities;
 
     public UserDetailsImpl(String id, String username, String email, String password,
-            String fullName, String profilePhoto,
+            String fullName, String profilePhoto, Filiere filiere, Promotion promotion,
             Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
@@ -32,6 +36,8 @@ public class UserDetailsImpl implements UserDetails {
         this.password = password;
         this.fullName = fullName;
         this.profilePhoto = profilePhoto;
+        this.filiere = filiere;
+        this.promotion = promotion;
         this.authorities = authorities;
     }
 
@@ -45,6 +51,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.getPassword(),
                 user.getFullName(),
                 user.getProfilePhoto(),
+                user.getFiliere(),
+                user.getPromotion(),
                 authorities);
     }
 
@@ -77,6 +85,14 @@ public class UserDetailsImpl implements UserDetails {
 
     public String getProfilePhoto() {
         return profilePhoto;
+    }
+
+    public Filiere getFiliere() {
+        return filiere;
+    }
+
+    public Promotion getPromotion() {
+        return promotion;
     }
 
     @Override

@@ -1,8 +1,10 @@
 package com.unigov.service;
 
 import com.unigov.dto.NotificationDtos.*;
+import com.unigov.entity.Filiere;
 import com.unigov.entity.Notification;
 import com.unigov.entity.Notification.NotificationType;
+import com.unigov.entity.Promotion;
 import com.unigov.entity.Role;
 import com.unigov.entity.User;
 import com.unigov.repository.NotificationRepository;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +29,40 @@ public class NotificationService {
 
     public void notifyAllStudents(NotificationType type, String message, String referenceId) {
         List<User> students = userRepository.findByRole(Role.ROLE_ETUDIANT);
+        for (User student : students) {
+            createNotification(student.getId(), type, message, referenceId);
+        }
+    }
+
+    /**
+     * Notify students matching the target audience criteria.
+     * If targetAll is true, all students are notified.
+     * Otherwise, filter by filiere and/or promotion sets.
+     */
+    public void notifyTargetedStudents(boolean targetAll, Set<Filiere> targetFilieres,
+                                        Set<Promotion> targetPromotions,
+                                        NotificationType type, String message, String referenceId) {
+        if (targetAll) {
+            notifyAllStudents(type, message, referenceId);
+            return;
+        }
+
+        List<User> students;
+        boolean hasFilieres = targetFilieres != null && !targetFilieres.isEmpty();
+        boolean hasPromotions = targetPromotions != null && !targetPromotions.isEmpty();
+
+        if (hasFilieres && hasPromotions) {
+            students = userRepository.findByRoleAndFiliereInAndPromotionIn(
+                    Role.ROLE_ETUDIANT, targetFilieres, targetPromotions);
+        } else if (hasFilieres) {
+            students = userRepository.findByRoleAndFiliereIn(Role.ROLE_ETUDIANT, targetFilieres);
+        } else if (hasPromotions) {
+            students = userRepository.findByRoleAndPromotionIn(Role.ROLE_ETUDIANT, targetPromotions);
+        } else {
+            // No targeting criteria with targetAll=false — treat as all
+            students = userRepository.findByRole(Role.ROLE_ETUDIANT);
+        }
+
         for (User student : students) {
             createNotification(student.getId(), type, message, referenceId);
         }

@@ -1,14 +1,29 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { User, Mail, Lock, Loader2, AlertCircle, ArrowRight, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { User, Mail, Lock, Loader2, AlertCircle, ArrowRight, CheckCircle2, Eye, EyeOff, GraduationCap, BookOpen } from 'lucide-react';
 import Logo from '../components/Logo';
+
+const FILIERES = [
+    { value: 'INFO', label: 'Informatique', icon: '💻' },
+    { value: 'INFOTRO', label: 'Infotronique', icon: '🔌' },
+    { value: 'MECA', label: 'Mécatronique', icon: '⚙️' },
+    { value: 'GSIL', label: 'GSIL', icon: '🏭' }
+];
+
+const PROMOTIONS = [
+    { value: 'PREMIERE_ANNEE', label: '1ère année', short: '1A' },
+    { value: 'DEUXIEME_ANNEE', label: '2ème année', short: '2A' },
+    { value: 'TROISIEME_ANNEE', label: '3ème année', short: '3A' }
+];
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-        fullName: ''
+        fullName: '',
+        filiere: '',
+        promotion: ''
     });
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -37,6 +52,10 @@ const RegisterPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!formData.filiere || !formData.promotion) {
+            setError('Veuillez sélectionner votre filière et votre promotion.');
+            return;
+        }
         setLoading(true);
         setError('');
         try {
@@ -116,6 +135,54 @@ const RegisterPage = () => {
                         </div>
                     </div>
 
+                    {/* Filière Selection */}
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-1">
+                            <GraduationCap size={12} /> Filière
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {FILIERES.map((f) => (
+                                <button
+                                    key={f.value}
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, filiere: f.value })}
+                                    className={`p-2.5 rounded-xl border-2 text-sm font-semibold transition-all flex items-center gap-2 ${
+                                        formData.filiere === f.value
+                                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 shadow-sm shadow-primary-100 dark:shadow-none'
+                                            : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                    }`}
+                                >
+                                    <span className="text-lg">{f.icon}</span>
+                                    <span className="truncate">{f.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Promotion Selection */}
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-1">
+                            <BookOpen size={12} /> Promotion
+                        </label>
+                        <div className="grid grid-cols-3 gap-2">
+                            {PROMOTIONS.map((p) => (
+                                <button
+                                    key={p.value}
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, promotion: p.value })}
+                                    className={`p-2.5 rounded-xl border-2 text-sm font-bold transition-all text-center ${
+                                        formData.promotion === p.value
+                                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 shadow-sm shadow-primary-100 dark:shadow-none'
+                                            : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                    }`}
+                                >
+                                    {p.short}
+                                    <span className="block text-[10px] font-medium mt-0.5 opacity-70">{p.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     <div className="space-y-2">
                         <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Email</label>
                         <div className="relative group">
@@ -177,7 +244,7 @@ const RegisterPage = () => {
 
                     <button
                         type="submit"
-                        disabled={loading || strength < 3}
+                        disabled={loading || strength < 3 || !formData.filiere || !formData.promotion}
                         className="btn-primary w-full !py-3.5 flex items-center justify-center gap-2 mt-4 shadow-lg shadow-primary-200 dark:shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? (

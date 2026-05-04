@@ -187,6 +187,72 @@ const DelegateDashboard = () => {
                     </div>
                 )}
 
+                {/* Filière/Promotion Breakdown */}
+                {!loading && stats.studentsByFiliere && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div className="card !p-5">
+                            <h3 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                                <Users size={18} className="text-sky-500" />
+                                Répartition par filière
+                            </h3>
+                            <div className="space-y-3">
+                                {[
+                                    { key: 'INFO', label: 'Informatique', icon: '💻', color: 'bg-blue-500' },
+                                    { key: 'INFOTRO', label: 'Infotronique', icon: '🔌', color: 'bg-emerald-500' },
+                                    { key: 'MECA', label: 'Mécatronique', icon: '⚙️', color: 'bg-orange-500' },
+                                    { key: 'GSIL', label: 'GSIL', icon: '🏭', color: 'bg-purple-500' }
+                                ].map((f) => {
+                                    const count = stats.studentsByFiliere?.[f.key] || 0;
+                                    const total = stats.totalStudents || 1;
+                                    const pct = Math.round((count / total) * 100);
+                                    return (
+                                        <div key={f.key}>
+                                            <div className="flex items-center justify-between text-sm mb-1">
+                                                <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                                                    <span>{f.icon}</span> {f.label}
+                                                </span>
+                                                <span className="font-bold text-slate-800 dark:text-white">{count} <span className="text-xs text-slate-400 font-medium">({pct}%)</span></span>
+                                            </div>
+                                            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
+                                                <div className={`${f.color} h-2 rounded-full transition-all duration-500`} style={{ width: `${pct}%` }} />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        <div className="card !p-5">
+                            <h3 className="font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                                <BarChart2 size={18} className="text-emerald-500" />
+                                Répartition par promotion
+                            </h3>
+                            <div className="space-y-3">
+                                {[
+                                    { key: 'PREMIERE_ANNEE', label: '1ère année', short: '1A', color: 'bg-sky-500' },
+                                    { key: 'DEUXIEME_ANNEE', label: '2ème année', short: '2A', color: 'bg-indigo-500' },
+                                    { key: 'TROISIEME_ANNEE', label: '3ème année', short: '3A', color: 'bg-violet-500' }
+                                ].map((p) => {
+                                    const count = stats.studentsByPromotion?.[p.key] || 0;
+                                    const total = stats.totalStudents || 1;
+                                    const pct = Math.round((count / total) * 100);
+                                    return (
+                                        <div key={p.key}>
+                                            <div className="flex items-center justify-between text-sm mb-1">
+                                                <span className="font-medium text-slate-700 dark:text-slate-300">
+                                                    <span className="font-bold">{p.short}</span> — {p.label}
+                                                </span>
+                                                <span className="font-bold text-slate-800 dark:text-white">{count} <span className="text-xs text-slate-400 font-medium">({pct}%)</span></span>
+                                            </div>
+                                            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
+                                                <div className={`${p.color} h-2 rounded-full transition-all duration-500`} style={{ width: `${pct}%` }} />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                )}
                 {/* Recent Complaints */}
                 <div className="card !p-0 overflow-hidden">
                     <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">

@@ -10,8 +10,39 @@ import {
     Send,
     Loader2,
     Paperclip,
-    X
+    X,
+    Globe,
+    Target,
+    Users
 } from 'lucide-react';
+
+const FILIERES = [
+    { value: 'INFO', label: 'Informatique', short: 'INFO' },
+    { value: 'INFOTRO', label: 'Infotronique', short: 'INFOTRO' },
+    { value: 'MECA', label: 'Mécatronique', short: 'MECA' },
+    { value: 'GSIL', label: 'GSIL', short: 'GSIL' }
+];
+
+const PROMOTIONS = [
+    { value: 'PREMIERE_ANNEE', label: '1ère année', short: '1A' },
+    { value: 'DEUXIEME_ANNEE', label: '2ème année', short: '2A' },
+    { value: 'TROISIEME_ANNEE', label: '3ème année', short: '3A' }
+];
+
+const TargetBadge = ({ targetAll, targetFilieres, targetPromotions, targetLabel }) => {
+    if (targetAll) {
+        return (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
+                <Globe size={10} /> Tous
+            </span>
+        );
+    }
+    return (
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 max-w-[200px] truncate" title={targetLabel}>
+            <Target size={10} /> {targetLabel || 'Ciblé'}
+        </span>
+    );
+};
 
 const AnnouncementsPage = () => {
     const { user } = useAuth();
@@ -25,6 +56,11 @@ const AnnouncementsPage = () => {
     const [file, setFile] = useState(null);
     const [submitting, setSubmitting] = useState(false);
     const [expandedId, setExpandedId] = useState(null);
+
+    // Target audience state
+    const [targetAll, setTargetAll] = useState(true);
+    const [selectedFilieres, setSelectedFilieres] = useState([]);
+    const [selectedPromotions, setSelectedPromotions] = useState([]);
 
     useEffect(() => {
         fetchAnnouncements();
@@ -42,6 +78,24 @@ const AnnouncementsPage = () => {
         }
     };
 
+    const toggleFiliere = (value) => {
+        setSelectedFilieres(prev =>
+            prev.includes(value) ? prev.filter(f => f !== value) : [...prev, value]
+        );
+    };
+
+    const togglePromotion = (value) => {
+        setSelectedPromotions(prev =>
+            prev.includes(value) ? prev.filter(p => p !== value) : [...prev, value]
+        );
+    };
+
+    const resetTargetForm = () => {
+        setTargetAll(true);
+        setSelectedFilieres([]);
+        setSelectedPromotions([]);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!title.trim() || !content.trim()) return;
@@ -51,12 +105,18 @@ const AnnouncementsPage = () => {
             data.append('title', title);
             data.append('content', content);
             if (file) data.append('file', file);
+            data.append('targetAll', targetAll);
+            if (!targetAll) {
+                selectedFilieres.forEach(f => data.append('targetFilieres', f));
+                selectedPromotions.forEach(p => data.append('targetPromotions', p));
+            }
 
             await api.post('/announcements', data);
             setShowForm(false);
             setTitle('');
             setContent('');
             setFile(null);
+            resetTargetForm();
             fetchAnnouncements();
         } catch (err) {
             alert(err.response?.data?.message || 'Erreur lors de la publication');
@@ -94,10 +154,10 @@ const AnnouncementsPage = () => {
                 {/* Creation Modal */}
                 {showForm && (
                     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg animate-in fade-in zoom-in duration-200">
-                            <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
+                            <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between sticky top-0 bg-white dark:bg-slate-900 z-10 rounded-t-2xl">
                                 <h3 className="text-lg font-bold text-slate-800 dark:text-white">Nouvelle Annonce</h3>
-                                <button onClick={() => setShowForm(false)} className="text-slate-400 hover:text-slate-600 text-xl">
+                                <button onClick={() => { setShowForm(false); resetTargetForm(); }} className="text-slate-400 hover:text-slate-600 text-xl">
                                     <X size={20} />
                                 </button>
                             </div>
@@ -115,13 +175,91 @@ const AnnouncementsPage = () => {
                                 <div>
                                     <label className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 block">Contenu</label>
                                     <textarea
-                                        className="input min-h-[160px]"
+                                        className="input min-h-[120px]"
                                         value={content}
                                         onChange={(e) => setContent(e.target.value)}
                                         placeholder="Rédigez votre annonce..."
                                         required
                                     />
                                 </div>
+
+                                {/* Target Audience Section */}
+                                <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                            <Users size={16} className="text-primary-500" /> Public cible
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={() => { setTargetAll(!targetAll); if (!targetAll) { setSelectedFilieres([]); setSelectedPromotions([]); } }}
+                                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${targetAll ? 'bg-primary-500' : 'bg-slate-300 dark:bg-slate-600'}`}
+                                        >
+                                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${targetAll ? 'translate-x-6' : 'translate-x-1'}`} />
+                                        </button>
+                                    </div>
+
+                                    {targetAll ? (
+                                        <p className="text-xs text-slate-400 flex items-center gap-1">
+                                            <Globe size={12} /> Visible par tous les étudiants
+                                        </p>
+                                    ) : (
+                                        <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                                            {/* Filières */}
+                                            <div>
+                                                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Filières</p>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {FILIERES.map((f) => (
+                                                        <button
+                                                            key={f.value}
+                                                            type="button"
+                                                            onClick={() => toggleFiliere(f.value)}
+                                                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                                                                selectedFilieres.includes(f.value)
+                                                                    ? 'bg-primary-500 text-white shadow-sm'
+                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                                            }`}
+                                                        >
+                                                            {f.short}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            {/* Promotions */}
+                                            <div>
+                                                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Promotions</p>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {PROMOTIONS.map((p) => (
+                                                        <button
+                                                            key={p.value}
+                                                            type="button"
+                                                            onClick={() => togglePromotion(p.value)}
+                                                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                                                                selectedPromotions.includes(p.value)
+                                                                    ? 'bg-primary-500 text-white shadow-sm'
+                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                                            }`}
+                                                        >
+                                                            {p.short}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            {/* Summary */}
+                                            {(selectedFilieres.length > 0 || selectedPromotions.length > 0) && (
+                                                <div className="bg-primary-50 dark:bg-primary-900/10 rounded-lg p-2 text-xs text-primary-700 dark:text-primary-300 font-medium">
+                                                    <Target size={12} className="inline mr-1" />
+                                                    {selectedFilieres.length > 0 && selectedFilieres.map(f => FILIERES.find(x => x.value === f)?.short).join(', ')}
+                                                    {selectedFilieres.length > 0 && selectedPromotions.length > 0 && ' · '}
+                                                    {selectedPromotions.length > 0 && selectedPromotions.map(p => PROMOTIONS.find(x => x.value === p)?.short).join(', ')}
+                                                </div>
+                                            )}
+                                            {!targetAll && selectedFilieres.length === 0 && selectedPromotions.length === 0 && (
+                                                <p className="text-xs text-amber-500 font-medium">⚠ Aucun filtre sélectionné — visible par tous</p>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
                                 <div>
                                     <label className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1 block">Pièce jointe (optionnel)</label>
                                     <label className="flex items-center justify-center gap-2 w-full p-3 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-sm">
@@ -131,7 +269,7 @@ const AnnouncementsPage = () => {
                                     </label>
                                 </div>
                                 <div className="flex justify-end gap-3 pt-2">
-                                    <button type="button" onClick={() => setShowForm(false)} className="px-5 py-2 text-slate-600 font-medium hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg">
+                                    <button type="button" onClick={() => { setShowForm(false); resetTargetForm(); }} className="px-5 py-2 text-slate-600 font-medium hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg">
                                         Annuler
                                     </button>
                                     <button type="submit" disabled={submitting} className="btn-primary px-6 flex items-center gap-2">
@@ -171,7 +309,7 @@ const AnnouncementsPage = () => {
                                                 >
                                                     {ann.title}
                                                 </h3>
-                                                <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
+                                                <div className="flex items-center gap-2 mt-1 text-xs text-slate-400 flex-wrap">
                                                     <span className="flex items-center gap-1">
                                                         <Calendar size={12} />
                                                         {ann.createdAt ? new Date(ann.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : ''}
@@ -182,6 +320,13 @@ const AnnouncementsPage = () => {
                                                             <span>{ann.delegateName}</span>
                                                         </>
                                                     )}
+                                                    <span>&middot;</span>
+                                                    <TargetBadge
+                                                        targetAll={ann.targetAll}
+                                                        targetFilieres={ann.targetFilieres}
+                                                        targetPromotions={ann.targetPromotions}
+                                                        targetLabel={ann.targetLabel}
+                                                    />
                                                     {ann.attachmentPath && (
                                                         <>
                                                             <span>&middot;</span>
@@ -210,7 +355,7 @@ const AnnouncementsPage = () => {
                                         )}
                                     </div>
 
-                                    {/* Content — collapsed by default, click title to expand */}
+                                    {/* Content — always visible */}
                                     <div className={`mt-3 pl-11`}>
                                         <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line">
                                             {ann.content}

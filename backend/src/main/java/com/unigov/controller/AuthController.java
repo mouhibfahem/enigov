@@ -1,6 +1,8 @@
 package com.unigov.controller;
 
 import com.unigov.dto.AuthDtos.*;
+import com.unigov.entity.Filiere;
+import com.unigov.entity.Promotion;
 import com.unigov.entity.Role;
 import com.unigov.entity.User;
 import com.unigov.repository.UserRepository;
@@ -121,7 +123,9 @@ public class AuthController {
                 userDetails.getEmail(),
                 role,
                 userDetails.getFullName(),
-                userDetails.getProfilePhoto()));
+                userDetails.getProfilePhoto(),
+                user.getFiliere() != null ? user.getFiliere().name() : null,
+                user.getPromotion() != null ? user.getPromotion().name() : null));
     }
 
     // ==================== SIGNUP ====================
@@ -146,6 +150,28 @@ public class AuthController {
                     .body(new MessageResponse("Erreur : Cet email est déjà utilisé."));
         }
 
+        // Validate filiere and promotion
+        Filiere filiere = null;
+        Promotion promotion = null;
+
+        if (signUpRequest.getFiliere() != null && !signUpRequest.getFiliere().isBlank()) {
+            try {
+                filiere = Filiere.valueOf(signUpRequest.getFiliere().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest()
+                        .body(new MessageResponse("Filière invalide. Choisissez parmi : INFO, INFOTRO, MECA, GSIL."));
+            }
+        }
+
+        if (signUpRequest.getPromotion() != null && !signUpRequest.getPromotion().isBlank()) {
+            try {
+                promotion = Promotion.valueOf(signUpRequest.getPromotion().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest()
+                        .body(new MessageResponse("Promotion invalide. Choisissez parmi : PREMIERE_ANNEE, DEUXIEME_ANNEE, TROISIEME_ANNEE."));
+            }
+        }
+
         // Auto-generate username from email prefix
         String username = signUpRequest.getEmail().split("@")[0].toLowerCase();
         // Ensure unique username
@@ -165,6 +191,8 @@ public class AuthController {
         user.setPassword(encoder.encode(signUpRequest.getPassword()));
         user.setFullName(signUpRequest.getFullName());
         user.setRole(Role.ROLE_ETUDIANT);
+        user.setFiliere(filiere);
+        user.setPromotion(promotion);
         user.setEmailVerified(false);
         user.setVerificationToken(verificationToken);
 
