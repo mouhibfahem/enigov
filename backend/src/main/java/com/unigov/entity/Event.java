@@ -24,6 +24,7 @@ public class Event {
     private String description;
 
     private LocalDateTime date;
+    private LocalDateTime endDate;
 
     private String location;
     
@@ -45,6 +46,8 @@ public class Event {
     public void setDescription(String description) { this.description = description; }
     public LocalDateTime getDate() { return date; }
     public void setDate(LocalDateTime date) { this.date = date; }
+    public LocalDateTime getEndDate() { return endDate; }
+    public void setEndDate(LocalDateTime endDate) { this.endDate = endDate; }
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
     public String getType() { return type; }

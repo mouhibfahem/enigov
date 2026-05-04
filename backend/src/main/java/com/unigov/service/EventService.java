@@ -25,6 +25,7 @@ public class EventService {
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
         event.setDate(request.getDate());
+        event.setEndDate(request.getEndDate());
         event.setLocation(request.getLocation());
         if (request.getType() != null) {
             event.setType(request.getType());
@@ -71,6 +72,7 @@ public class EventService {
         r.setTitle(e.getTitle());
         r.setDescription(e.getDescription());
         r.setDate(e.getDate());
+        r.setEndDate(e.getEndDate());
         r.setLocation(e.getLocation());
         r.setType(e.getType());
         r.setCreatedAt(e.getCreatedAt());

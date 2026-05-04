@@ -77,12 +77,12 @@ const LandingPage = () => {
 
     return (
         <div className="min-h-screen bg-[#020617] text-white selection:bg-primary-500 selection:text-white overflow-x-hidden font-sans">
-            
+
             {/* Dark Studio Background with Transparent Hero Photo */}
             <div className="fixed inset-0 z-0">
-                <div 
+                <div
                     className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-overlay grayscale"
-                    style={{ 
+                    style={{
                         backgroundImage: 'url(/hero-bg.jpg)',
                         maskImage: 'radial-gradient(circle at center, black 0%, transparent 80%)',
                         WebkitMaskImage: 'radial-gradient(circle at center, black 0%, transparent 80%)'
@@ -95,13 +95,13 @@ const LandingPage = () => {
 
             {/* Premium Navigation */}
             <header className="fixed top-0 left-0 right-0 z-50 p-4 sm:p-6">
-                <motion.div 
+                <motion.div
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     className="max-w-7xl mx-auto flex items-center justify-between bg-white/5 backdrop-blur-xl border border-white/10 px-6 py-3 rounded-2xl shadow-2xl"
                 >
                     <Logo textColor="text-white" />
-                    
+
                     <nav className="hidden md:flex items-center gap-8">
                         <button onClick={() => scrollToSection('services')} className="text-sm font-bold text-slate-400 hover:text-white transition-colors tracking-widest uppercase cursor-pointer">
                             Services
@@ -140,7 +140,7 @@ const LandingPage = () => {
                         </span>
                     </motion.div>
 
-                    <motion.h1 
+                    <motion.h1
                         initial={{ y: 40, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ duration: 0.8 }}
@@ -172,7 +172,7 @@ const LandingPage = () => {
                                 DÉCOUVRIR <ArrowRight size={24} strokeWidth={3} />
                             </span>
                         </Link>
-                        
+
                         <div className="flex items-center gap-6 px-8 py-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
                             <div className="flex -space-x-4">
                                 {['student-1.jpg', 'student-2.jpg', 'student-3.jpg'].map((img, i) => (
@@ -182,7 +182,7 @@ const LandingPage = () => {
                                 ))}
                             </div>
                             <div className="text-left">
-                                <div className="text-sm font-black text-white">+500 Ingénieurs</div>
+                                <div className="text-sm font-black text-white">+200 Ingénieurs</div>
                                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Inscrits cette année</div>
                             </div>
                         </div>
@@ -265,7 +265,7 @@ const LandingPage = () => {
                             REJOINDRE ENIGOV
                         </Link>
                     </div>
-                    
+
                     <div className="mt-40 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
                         <div className="flex gap-8 text-[10px] font-black tracking-[0.2em] text-slate-500">
                             <a href="#" className="hover:text-white transition-colors">DATA PROTECTION</a>

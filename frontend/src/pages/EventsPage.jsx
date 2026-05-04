@@ -46,6 +46,7 @@ const EventsPage = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [date, setDate] = useState('');
+    const [endDate, setEndDate] = useState('');
     const [location, setLocation] = useState('');
     const [type, setType] = useState('SOCIAL');
     const [submitting, setSubmitting] = useState(false);
@@ -76,7 +77,14 @@ const EventsPage = () => {
         if (!title.trim() || !date) return;
         setSubmitting(true);
         try {
-            await api.post('/events', { title, description, date, location, type });
+            await api.post('/events', { 
+                title, 
+                description, 
+                date, 
+                endDate: endDate || null, 
+                location, 
+                type 
+            });
             setShowForm(false);
             resetForm();
             fetchEvents();
@@ -91,6 +99,7 @@ const EventsPage = () => {
         setTitle('');
         setDescription('');
         setDate('');
+        setEndDate('');
         setLocation('');
         setType('SOCIAL');
     };
@@ -119,11 +128,16 @@ const EventsPage = () => {
     const nextMonth = () => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)));
 
     const getEventsForDay = (day) => {
+        const checkDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
         return events.filter(e => {
-            const d = new Date(e.date);
-            return d.getDate() === day && 
-                   d.getMonth() === currentMonth.getMonth() && 
-                   d.getFullYear() === currentMonth.getFullYear();
+            const start = new Date(e.date);
+            const end = e.endDate ? new Date(e.endDate) : start;
+            
+            // On compare uniquement les dates (sans les heures)
+            const s = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+            const n = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+            
+            return checkDate >= s && checkDate <= n;
         });
     };
 
@@ -211,17 +225,18 @@ const EventsPage = () => {
                                 {[...Array(daysInMonth)].map((_, i) => {
                                     const day = i + 1;
                                     const dayEvents = getEventsForDay(day);
-                                    const isToday = day === new Date().getDate() && 
-                                                    currentMonth.getMonth() === new Date().getMonth() && 
-                                                    currentMonth.getFullYear() === new Date().getFullYear();
+                                    const firstEvent = dayEvents[0];
+                                    const bgClass = firstEvent ? categoryColors[firstEvent.type]?.split(' ')[0].replace('bg-', 'bg-').replace('-600', '-50') : '';
+                                    const darkBgClass = firstEvent ? categoryColors[firstEvent.type]?.split(' ')[0].replace('bg-', 'dark:bg-').replace('-600', '/10') : 'dark:bg-slate-900';
 
                                     return (
-                                        <div key={day} className="p-2 border-r border-b border-slate-100 dark:border-slate-800 last:border-r-0 relative group hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
-                                            <span className={`text-sm font-bold ${isToday ? 'bg-primary-600 text-white w-7 h-7 flex items-center justify-center rounded-full shadow-lg shadow-primary-500/30' : 'text-slate-500'}`}>
-                                                {day}
-                                            </span>
-                                            
-                                            <div className="mt-2 space-y-1 max-h-[80px] overflow-y-auto no-scrollbar">
+                                        <div key={day} className={`min-h-[120px] p-2 transition-colors ${bgClass} ${darkBgClass}`}>
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className={`text-sm font-black ${isToday(day) ? 'w-7 h-7 bg-primary-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-primary-500/30' : 'text-slate-400'}`}>
+                                                    {day}
+                                                </span>
+                                            </div>
+                                            <div className="space-y-1">
                                                 {dayEvents.map(e => (
                                                     <div 
                                                         key={e.id} 
@@ -264,6 +279,9 @@ const EventsPage = () => {
                                                     </span>
                                                     <span className="text-2xl font-black">
                                                         {new Date(event.date).getDate()}
+                                                        {event.endDate && new Date(event.endDate).getDate() !== new Date(event.date).getDate() && (
+                                                            <span className="text-xs ml-0.5">-{new Date(event.endDate).getDate()}</span>
+                                                        )}
                                                     </span>
                                                 </div>
                                                 <div>
@@ -334,8 +352,12 @@ const EventsPage = () => {
                                             <textarea className="input-premium w-full min-h-[80px]" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Détails..." />
                                         </div>
                                         <div>
-                                            <label className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block">Date & Heure</label>
+                                            <label className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block">Début</label>
                                             <input type="datetime-local" className="input-premium w-full" value={date} onChange={(e) => setDate(e.target.value)} required />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block">Fin (Optionnel)</label>
+                                            <input type="datetime-local" className="input-premium w-full" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
                                         </div>
                                         <div>
                                             <label className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block">Catégorie</label>

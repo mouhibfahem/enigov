@@ -8,6 +8,7 @@ public class EventDtos {
         private String title;
         private String description;
         private LocalDateTime date;
+        private LocalDateTime endDate;
         private String location;
         private String type;
 
@@ -17,6 +18,8 @@ public class EventDtos {
         public void setDescription(String description) { this.description = description; }
         public LocalDateTime getDate() { return date; }
         public void setDate(LocalDateTime date) { this.date = date; }
+        public LocalDateTime getEndDate() { return endDate; }
+        public void setEndDate(LocalDateTime endDate) { this.endDate = endDate; }
         public String getLocation() { return location; }
         public void setLocation(String location) { this.location = location; }
         public String getType() { return type; }
@@ -28,6 +31,7 @@ public class EventDtos {
         private String title;
         private String description;
         private LocalDateTime date;
+        private LocalDateTime endDate;
         private String location;
         private String type;
         private LocalDateTime createdAt;
@@ -40,6 +44,8 @@ public class EventDtos {
         public void setDescription(String description) { this.description = description; }
         public LocalDateTime getDate() { return date; }
         public void setDate(LocalDateTime date) { this.date = date; }
+        public LocalDateTime getEndDate() { return endDate; }
+        public void setEndDate(LocalDateTime endDate) { this.endDate = endDate; }
         public String getLocation() { return location; }
         public void setLocation(String location) { this.location = location; }
         public String getType() { return type; }
