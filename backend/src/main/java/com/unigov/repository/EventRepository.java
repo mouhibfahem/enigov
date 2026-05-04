@@ -11,4 +11,5 @@ import java.util.List;
 public interface EventRepository extends JpaRepository<Event, String> {
     List<Event> findAllByOrderByDateAsc();
     List<Event> findByDateAfterOrderByDateAsc(LocalDateTime date);
+    boolean existsByTitle(String title);
 }

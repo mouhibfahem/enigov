@@ -26,6 +26,9 @@ public class EventService {
         event.setDescription(request.getDescription());
         event.setDate(request.getDate());
         event.setLocation(request.getLocation());
+        if (request.getType() != null) {
+            event.setType(request.getType());
+        }
 
         Event saved = eventRepository.save(event);
 
@@ -69,6 +72,7 @@ public class EventService {
         r.setDescription(e.getDescription());
         r.setDate(e.getDate());
         r.setLocation(e.getLocation());
+        r.setType(e.getType());
         r.setCreatedAt(e.getCreatedAt());
         return r;
     }

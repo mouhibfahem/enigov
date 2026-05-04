@@ -26,6 +26,9 @@ public class Event {
     private LocalDateTime date;
 
     private String location;
+    
+    @Column(nullable = false)
+    private String type = "SOCIAL"; // ACADEMIC, SOCIAL, ADMIN, EXAM
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -44,6 +47,8 @@ public class Event {
     public void setDate(LocalDateTime date) { this.date = date; }
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }
