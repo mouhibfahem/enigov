@@ -8,7 +8,6 @@ import com.unigov.entity.User;
 import com.unigov.repository.ComplaintRepository;
 import com.unigov.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,11 +27,8 @@ public class ComplaintService {
     @Autowired
     private NotificationService notificationService;
 
-    @Value("${file.upload-dir:uploads}")
-    private String uploadDir;
-
     @Transactional
-    public ComplaintResponse createComplaint(ComplaintRequest request, String username, String attachmentPath) {
+    public ComplaintResponse createComplaint(ComplaintRequest request, String username, String attachmentUrl) {
         User student = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
@@ -43,7 +39,7 @@ public class ComplaintService {
         complaint.setStatus(ComplaintStatus.PENDING);
         complaint.setStudentId(student.getId());
         complaint.setStudentName(student.getFullName());
-        complaint.setAttachmentPath(attachmentPath);
+        complaint.setAttachmentPath(attachmentUrl); // URL Cloudinary
 
         Complaint saved = complaintRepository.save(complaint);
         return mapToResponse(saved, student.getId());
@@ -124,9 +120,7 @@ public class ComplaintService {
         }
 
         String userId = user.getId();
-        // Remove from downvotes if present
         complaint.getDownvotes().remove(userId);
-        // Toggle upvote
         if (complaint.getUpvotes().contains(userId)) {
             complaint.getUpvotes().remove(userId);
         } else {
@@ -149,9 +143,7 @@ public class ComplaintService {
         }
 
         String userId = user.getId();
-        // Remove from upvotes if present
         complaint.getUpvotes().remove(userId);
-        // Toggle downvote
         if (complaint.getDownvotes().contains(userId)) {
             complaint.getDownvotes().remove(userId);
         } else {
@@ -166,16 +158,7 @@ public class ComplaintService {
     public void deleteComplaint(String id) {
         Complaint complaint = complaintRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Réclamation non trouvée"));
-
-        if (complaint.getAttachmentPath() != null) {
-            try {
-                java.nio.file.Path rootLocation = java.nio.file.Paths.get(uploadDir).toAbsolutePath().normalize();
-                java.nio.file.Path filePath = rootLocation.resolve(complaint.getAttachmentPath()).normalize();
-                java.nio.file.Files.deleteIfExists(filePath);
-            } catch (java.io.IOException e) {
-                // Log but don't fail
-            }
-        }
+        // Suppression Cloudinary optionnelle ici
         complaintRepository.delete(complaint);
     }
 

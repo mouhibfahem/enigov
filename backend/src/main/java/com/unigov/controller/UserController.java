@@ -3,25 +3,18 @@ package com.unigov.controller;
 import com.unigov.entity.User;
 import com.unigov.repository.UserRepository;
 import com.unigov.security.UserDetailsImpl;
+import com.unigov.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 @RestController
@@ -39,8 +32,8 @@ public class UserController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    @Autowired
+    FileStorageService fileStorageService;
 
     // ==================== GET CURRENT USER ====================
 
@@ -102,35 +95,21 @@ public class UserController {
         }
 
         try {
-            Path rootLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
-            Files.createDirectories(rootLocation);
+            // Upload to Cloudinary via FileStorageService
+            String photoUrl = fileStorageService.storeFile(file);
 
-            // Delete old photo if exists
-            if (user.getProfilePhoto() != null) {
-                Path oldPhoto = rootLocation.resolve(user.getProfilePhoto());
-                Files.deleteIfExists(oldPhoto);
-            }
-
-            String originalName = StringUtils.cleanPath(file.getOriginalFilename());
-            String extension = originalName.contains(".")
-                    ? originalName.substring(originalName.lastIndexOf("."))
-                    : ".jpg";
-            String uniqueFileName = UUID.randomUUID().toString() + extension;
-            Path targetLocation = rootLocation.resolve(uniqueFileName);
-
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
-            user.setProfilePhoto(uniqueFileName);
+            // Enregistrer l'URL Cloudinary dans le profil utilisateur
+            user.setProfilePhoto(photoUrl);
             userRepository.save(user);
 
             return ResponseEntity.ok(Map.of(
                     "message", "Photo de profil mise à jour.",
-                    "profilePhoto", uniqueFileName
+                    "profilePhoto", photoUrl
             ));
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError()
-                    .body(Map.of("message", "Erreur lors de l'upload du fichier."));
+                    .body(Map.of("message", "Erreur lors de l'upload vers Cloudinary."));
         }
     }
 
@@ -148,19 +127,16 @@ public class UserController {
 
         User user = getAuthenticatedUser();
 
-        // Verify current password
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
             return ResponseEntity.status(401)
                     .body(Map.of("message", "Le mot de passe actuel est incorrect."));
         }
 
-        // Validate new password strength
         if (!PASSWORD_PATTERN.matcher(newPassword).matches()) {
             return ResponseEntity.badRequest()
                     .body(Map.of("message", "Le nouveau mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre."));
         }
 
-        // Don't allow same password
         if (passwordEncoder.matches(newPassword, user.getPassword())) {
             return ResponseEntity.badRequest()
                     .body(Map.of("message", "Le nouveau mot de passe doit être différent de l'ancien."));

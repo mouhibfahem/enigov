@@ -4,7 +4,6 @@ import com.unigov.dto.RegulationDtos.*;
 import com.unigov.entity.Regulation;
 import com.unigov.repository.RegulationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,14 +15,11 @@ public class RegulationService {
     @Autowired
     private RegulationRepository regulationRepository;
 
-    @Value("${file.upload-dir:uploads}")
-    private String uploadDir;
-
-    public RegulationResponse createRegulation(RegulationRequest request, String filePath) {
+    public RegulationResponse createRegulation(RegulationRequest request, String fileUrl) {
         Regulation regulation = new Regulation();
         regulation.setTitle(request.getTitle());
         regulation.setDescription(request.getDescription());
-        regulation.setFilePath(filePath);
+        regulation.setFilePath(fileUrl); // URL Cloudinary
 
         Regulation saved = regulationRepository.save(regulation);
         return mapToResponse(saved);
@@ -44,16 +40,7 @@ public class RegulationService {
     public void deleteRegulation(String id) {
         Regulation regulation = regulationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Document non trouvé"));
-
-        if (regulation.getFilePath() != null) {
-            try {
-                java.nio.file.Path rootLocation = java.nio.file.Paths.get(uploadDir).toAbsolutePath().normalize();
-                java.nio.file.Path filePath = rootLocation.resolve(regulation.getFilePath()).normalize();
-                java.nio.file.Files.deleteIfExists(filePath);
-            } catch (java.io.IOException e) {
-                // Log but don't fail
-            }
-        }
+        // La suppression sur Cloudinary peut être ajoutée ici si nécessaire
         regulationRepository.delete(regulation);
     }
 

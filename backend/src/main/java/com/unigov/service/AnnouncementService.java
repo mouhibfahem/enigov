@@ -10,7 +10,6 @@ import com.unigov.entity.User;
 import com.unigov.repository.AnnouncementRepository;
 import com.unigov.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -30,11 +29,8 @@ public class AnnouncementService {
     @Autowired
     private NotificationService notificationService;
 
-    @Value("${file.upload-dir:uploads}")
-    private String uploadDir;
-
     public AnnouncementResponse createAnnouncement(AnnouncementRequest request, String username,
-                                                     String attachmentPath,
+                                                     String attachmentUrl,
                                                      boolean targetAll,
                                                      Set<Filiere> targetFilieres,
                                                      Set<Promotion> targetPromotions) {
@@ -46,7 +42,7 @@ public class AnnouncementService {
         announcement.setContent(request.getContent());
         announcement.setDelegateId(delegate.getId());
         announcement.setDelegateName(delegate.getFullName());
-        announcement.setAttachmentPath(attachmentPath);
+        announcement.setAttachmentPath(attachmentUrl); // On stocke l'URL complète de Cloudinary
         announcement.setTargetAll(targetAll);
         announcement.setTargetFilieres(targetFilieres != null ? targetFilieres : new HashSet<>());
         announcement.setTargetPromotions(targetPromotions != null ? targetPromotions : new HashSet<>());
@@ -72,12 +68,10 @@ public class AnnouncementService {
 
         List<Announcement> all = announcementRepository.findAllByOrderByCreatedAtDesc();
 
-        // Delegates see everything
         if (user.getRole() == Role.ROLE_DELEGUE) {
             return all.stream().map(this::mapToResponse).collect(Collectors.toList());
         }
 
-        // Students see only announcements targeted to them
         return all.stream()
                 .filter(a -> a.isVisibleTo(user.getFiliere(), user.getPromotion()))
                 .map(this::mapToResponse)
@@ -93,16 +87,7 @@ public class AnnouncementService {
     public void deleteAnnouncement(String id) {
         Announcement announcement = announcementRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Annonce non trouvée"));
-
-        if (announcement.getAttachmentPath() != null) {
-            try {
-                java.nio.file.Path rootLocation = java.nio.file.Paths.get(uploadDir).toAbsolutePath().normalize();
-                java.nio.file.Path filePath = rootLocation.resolve(announcement.getAttachmentPath()).normalize();
-                java.nio.file.Files.deleteIfExists(filePath);
-            } catch (java.io.IOException e) {
-                // Log but don't fail
-            }
-        }
+        // Note: On pourrait ajouter une logique pour supprimer sur Cloudinary ici si besoin
         announcementRepository.delete(announcement);
     }
 
