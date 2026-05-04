@@ -127,16 +127,20 @@ const EventsPage = () => {
     const prevMonth = () => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)));
     const nextMonth = () => setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)));
 
+    const isToday = (day) => {
+        const now = new Date();
+        return day === now.getDate() && 
+               currentMonth.getMonth() === now.getMonth() && 
+               currentMonth.getFullYear() === now.getFullYear();
+    };
+
     const getEventsForDay = (day) => {
         const checkDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
         return events.filter(e => {
             const start = new Date(e.date);
             const end = e.endDate ? new Date(e.endDate) : start;
-            
-            // On compare uniquement les dates (sans les heures)
             const s = new Date(start.getFullYear(), start.getMonth(), start.getDate());
             const n = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-            
             return checkDate >= s && checkDate <= n;
         });
     };
