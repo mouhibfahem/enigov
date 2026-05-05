@@ -12,10 +12,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.unigov.entity.Role;
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -146,6 +151,28 @@ public class UserController {
         userRepository.save(user);
 
         return ResponseEntity.ok(Map.of("message", "Mot de passe modifié avec succès."));
+    }
+
+    // ==================== LIST STUDENTS (Delegate only) ====================
+
+    @GetMapping("/students")
+    @PreAuthorize("hasAuthority('ROLE_DELEGUE')")
+    public ResponseEntity<?> getAllStudents() {
+        List<User> students = userRepository.findByRole(Role.ROLE_ETUDIANT);
+
+        List<Map<String, Object>> result = students.stream().map(s -> {
+            Map<String, Object> dto = new HashMap<>();
+            dto.put("id", s.getId());
+            dto.put("fullName", s.getFullName());
+            dto.put("username", s.getUsername());
+            dto.put("email", s.getEmail());
+            dto.put("filiere", s.getFiliere() != null ? s.getFiliere().name() : null);
+            dto.put("promotion", s.getPromotion() != null ? s.getPromotion().name() : null);
+            dto.put("profilePhoto", s.getProfilePhoto());
+            return dto;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(result);
     }
 
     // ==================== HELPER ====================

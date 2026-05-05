@@ -11,7 +11,8 @@ import {
     Settings,
     LogOut,
     Mail,
-    CalendarDays
+    CalendarDays,
+    Users
 } from 'lucide-react';
 import Logo from './Logo';
 import { useAuth } from '../context/AuthContext';
@@ -75,8 +76,9 @@ const Sidebar = () => {
             ]
         },
         {
-            title: 'COMMUNICATION',
+            title: 'COMMUNAUTÉ',
             items: [
+                { icon: Users, label: 'Étudiants', path: '/students' },
                 { icon: Mail, label: 'Messagerie', path: '/messaging' }
             ]
         },

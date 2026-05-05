@@ -18,33 +18,40 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 
-const StatCard = ({ icon: Icon, label, value, color, loading }) => (
-    <div className="card !p-5 flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color}`}>
-            <Icon size={22} />
+const StatCard = ({ icon: Icon, label, value, color, loading, to }) => {
+    const content = (
+        <div className={`card !p-5 flex items-center gap-4 ${to ? 'hover:shadow-lg hover:scale-[1.02] transition-all cursor-pointer' : ''}`}>
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color}`}>
+                <Icon size={22} />
+            </div>
+            <div className="flex-1">
+                <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{label}</p>
+                {loading ? (
+                    <div className="h-7 w-16 bg-slate-100 dark:bg-slate-800 rounded animate-pulse mt-1" />
+                ) : (
+                    <p className="text-2xl font-black text-slate-800 dark:text-white">{value}</p>
+                )}
+            </div>
+            {to && !loading && <ArrowRight size={16} className="text-slate-300 dark:text-slate-600" />}
         </div>
-        <div>
-            <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{label}</p>
-            {loading ? (
-                <div className="h-7 w-16 bg-slate-100 dark:bg-slate-800 rounded animate-pulse mt-1" />
-            ) : (
-                <p className="text-2xl font-black text-slate-800 dark:text-white">{value}</p>
-            )}
-        </div>
-    </div>
-);
+    );
+    if (to) return <Link to={to} className="block">{content}</Link>;
+    return content;
+};
 
 const DelegateDashboard = () => {
     const [stats, setStats] = useState({});
     const [recentComplaints, setRecentComplaints] = useState([]);
+    const [recentStudents, setRecentStudents] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [statsRes, complaintsRes] = await Promise.allSettled([
+                const [statsRes, complaintsRes, studentsRes] = await Promise.allSettled([
                     api.getDashboardStats(),
-                    api.get('/complaints')
+                    api.get('/complaints'),
+                    api.getStudents()
                 ]);
 
                 if (statsRes.status === 'fulfilled') {
@@ -53,6 +60,10 @@ const DelegateDashboard = () => {
 
                 if (complaintsRes.status === 'fulfilled') {
                     setRecentComplaints((complaintsRes.value.data || []).slice(0, 5));
+                }
+
+                if (studentsRes.status === 'fulfilled') {
+                    setRecentStudents((studentsRes.value.data || []).slice(0, 6));
                 }
             } catch {
                 // Silently handle
@@ -102,6 +113,7 @@ const DelegateDashboard = () => {
                         value={stats.totalStudents || 0}
                         color="bg-sky-500/10 text-sky-500 dark:bg-sky-500/20 dark:text-sky-400"
                         loading={loading}
+                        to="/students"
                     />
                     <StatCard
                         icon={Gavel}
@@ -253,6 +265,76 @@ const DelegateDashboard = () => {
                         </div>
                     </div>
                 )}
+
+                {/* Recent Students Preview */}
+                {!loading && recentStudents.length > 0 && (
+                    <div className="card !p-0 overflow-hidden">
+                        <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-2">
+                                <Users size={18} className="text-sky-500" />
+                                <h3 className="font-bold text-slate-800 dark:text-white">Étudiants inscrits</h3>
+                                <span className="ml-1 px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400 text-[10px] font-bold">
+                                    {stats.totalStudents || 0}
+                                </span>
+                            </div>
+                            <Link to="/students" className="text-xs font-bold text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1">
+                                Voir tous <ArrowRight size={14} />
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-y sm:divide-y-0 divide-slate-100 dark:divide-slate-800">
+                            {recentStudents.map((student) => {
+                                const filiereConfig = {
+                                    INFO: { label: 'INFO', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
+                                    INFOTRO: { label: 'INFOTRO', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' },
+                                    MECA: { label: 'MECA', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' },
+                                    GSIL: { label: 'GSIL', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' }
+                                };
+                                const promoConfig = {
+                                    PREMIERE_ANNEE: '1A', DEUXIEME_ANNEE: '2A', TROISIEME_ANNEE: '3A'
+                                };
+                                const fil = filiereConfig[student.filiere];
+                                const initials = student.fullName
+                                    ? student.fullName.split(/\s+/).map(w => w[0]).join('').substring(0, 2).toUpperCase()
+                                    : (student.username || '?').substring(0, 2).toUpperCase();
+
+                                return (
+                                    <div key={student.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                        {student.profilePhoto ? (
+                                            <img src={student.profilePhoto} alt="" className="w-9 h-9 rounded-full object-cover ring-2 ring-white dark:ring-slate-700 shadow-sm" />
+                                        ) : (
+                                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold ring-2 ring-white dark:ring-slate-700 shadow-sm">
+                                                {initials}
+                                            </div>
+                                        )}
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-sm font-semibold text-slate-800 dark:text-white truncate">
+                                                {student.fullName || student.username}
+                                            </p>
+                                            <div className="flex items-center gap-1.5 mt-0.5">
+                                                {fil && (
+                                                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${fil.color}`}>
+                                                        {fil.label}
+                                                    </span>
+                                                )}
+                                                {student.promotion && (
+                                                    <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500">
+                                                        {promoConfig[student.promotion] || ''}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        {(stats.totalStudents || 0) > 6 && (
+                            <Link to="/students" className="block text-center py-3 border-t border-slate-100 dark:border-slate-800 text-xs font-bold text-primary-600 dark:text-primary-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                Voir les {stats.totalStudents} étudiants →
+                            </Link>
+                        )}
+                    </div>
+                )}
+
                 {/* Recent Complaints */}
                 <div className="card !p-0 overflow-hidden">
                     <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">

@@ -71,6 +71,7 @@ api.markAllNotificationsRead = () => api.put('/notifications/read-all');
 
 // Stats (Delegate)
 api.getDashboardStats = () => api.get('/stats');
+api.getStudents = () => api.get('/users/students');
 
 export default api;
 

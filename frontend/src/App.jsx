@@ -16,6 +16,7 @@ import MessagingPage from './pages/MessagingPage';
 import SettingsPage from './pages/SettingsPage';
 import DecisionsPage from './pages/DecisionsPage';
 import EventsPage from './pages/EventsPage';
+import StudentsPage from './pages/StudentsPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -109,6 +110,11 @@ const AnimatedRoutes = () => {
                     <ProtectedRoute>
                         <PageTransition><EventsPage /></PageTransition>
                     </ProtectedRoute>
+                } />
+                <Route path="/students" element={
+                    <RoleProtectedRoute allowedRoles={['ROLE_DELEGUE']}>
+                        <PageTransition><StudentsPage /></PageTransition>
+                    </RoleProtectedRoute>
                 } />
 
                 {/* Catch-all */}
