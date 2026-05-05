@@ -19,24 +19,35 @@ import {
 import api from '../services/api';
 
 const StatCard = ({ icon: Icon, label, value, color, loading, to }) => {
-    const content = (
-        <div className={`card !p-5 flex items-center gap-4 ${to ? 'hover:shadow-lg hover:scale-[1.02] transition-all cursor-pointer' : ''}`}>
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color}`}>
+    const cardContent = (
+        <div className={`card !p-5 flex items-center gap-4 h-full ${to ? 'hover:shadow-xl hover:scale-[1.02] transition-all duration-300' : ''}`}>
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${color}`}>
                 <Icon size={22} />
             </div>
-            <div className="flex-1">
-                <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{label}</p>
+            <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">{label}</p>
                 {loading ? (
                     <div className="h-7 w-16 bg-slate-100 dark:bg-slate-800 rounded animate-pulse mt-1" />
                 ) : (
                     <p className="text-2xl font-black text-slate-800 dark:text-white">{value}</p>
                 )}
             </div>
-            {to && !loading && <ArrowRight size={16} className="text-slate-300 dark:text-slate-600" />}
+            {to && !loading && (
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-300 group-hover:text-primary-500 transition-colors">
+                    <ArrowRight size={16} />
+                </div>
+            )}
         </div>
     );
-    if (to) return <Link to={to} className="block">{content}</Link>;
-    return content;
+
+    if (to) {
+        return (
+            <Link to={to} className="block h-full group">
+                {cardContent}
+            </Link>
+        );
+    }
+    return cardContent;
 };
 
 const DelegateDashboard = () => {
@@ -121,6 +132,7 @@ const DelegateDashboard = () => {
                         value={stats.totalComplaints || 0}
                         color="bg-indigo-500/10 text-indigo-500 dark:bg-indigo-500/20 dark:text-indigo-400"
                         loading={loading}
+                        to="/complaints"
                     />
                     <StatCard
                         icon={Clock}
@@ -128,6 +140,7 @@ const DelegateDashboard = () => {
                         value={stats.pendingComplaints || 0}
                         color="bg-amber-500/10 text-amber-500 dark:bg-amber-500/20 dark:text-amber-400"
                         loading={loading}
+                        to="/complaints"
                     />
                     <StatCard
                         icon={BarChart2}
@@ -135,6 +148,7 @@ const DelegateDashboard = () => {
                         value={stats.activePolls || 0}
                         color="bg-emerald-500/10 text-emerald-500 dark:bg-emerald-500/20 dark:text-emerald-400"
                         loading={loading}
+                        to="/polls"
                     />
                 </div>
 
@@ -145,6 +159,7 @@ const DelegateDashboard = () => {
                         value={stats.totalAnnouncements || 0}
                         color="bg-blue-500/10 text-blue-500 dark:bg-blue-500/20 dark:text-blue-400"
                         loading={loading}
+                        to="/announcements"
                     />
                     <StatCard
                         icon={ClipboardList}
