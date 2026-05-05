@@ -318,7 +318,7 @@ const LandingPage = () => {
 
                             {/* Social Buttons */}
                             <div className="flex gap-4 pt-4">
-                                <a href="https://www.facebook.com/ENICarthage.Tunisie" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-primary-500 transition-all text-slate-400 hover:text-white">
+                                <a href="https://www.facebook.com/p/Ecole-Nationale-dIng%C3%A9nieurs-de-Carthage-ENICarthage-100057503648571/" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-primary-500 transition-all text-slate-400 hover:text-white">
                                     <Facebook size={24} />
                                 </a>
                                 <a href="https://www.linkedin.com/school/enicarthage/" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-primary-500 transition-all text-slate-400 hover:text-white">
@@ -339,7 +339,7 @@ const LandingPage = () => {
                             <div className="absolute top-0 right-0 p-8 opacity-5">
                                 <Users size={120} />
                             </div>
-                            
+
                             <h3 className="text-3xl font-black mb-10 tracking-tight flex items-center gap-3">
                                 <Users className="text-primary-500" size={28} /> Administration
                             </h3>
