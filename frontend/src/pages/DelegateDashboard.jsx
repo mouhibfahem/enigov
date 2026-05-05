@@ -14,7 +14,11 @@ import {
     TrendingUp,
     Clock,
     CheckCircle2,
-    XCircle
+    XCircle,
+    Laptop,
+    Cpu,
+    Settings,
+    Factory
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -224,10 +228,10 @@ const DelegateDashboard = () => {
                             </h3>
                             <div className="space-y-3">
                                 {[
-                                    { key: 'INFO', label: 'Informatique', icon: '💻', color: 'bg-blue-500' },
-                                    { key: 'INFOTRO', label: 'Infotronique', icon: '🔌', color: 'bg-emerald-500' },
-                                    { key: 'MECA', label: 'Mécatronique', icon: '⚙️', color: 'bg-orange-500' },
-                                    { key: 'GSIL', label: 'GSIL', icon: '🏭', color: 'bg-purple-500' }
+                                    { key: 'INFO', label: 'Informatique', icon: Laptop, color: 'bg-blue-500' },
+                                    { key: 'INFOTRO', label: 'Infotronique', icon: Cpu, color: 'bg-emerald-500' },
+                                    { key: 'MECA', label: 'Mécatronique', icon: Settings, color: 'bg-orange-500' },
+                                    { key: 'GSIL', label: 'GSIL', icon: Factory, color: 'bg-purple-500' }
                                 ].map((f) => {
                                     const count = stats.studentsByFiliere?.[f.key] || 0;
                                     const total = stats.totalStudents || 1;
@@ -236,7 +240,7 @@ const DelegateDashboard = () => {
                                         <div key={f.key}>
                                             <div className="flex items-center justify-between text-sm mb-1">
                                                 <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                                                    <span>{f.icon}</span> {f.label}
+                                                    <f.icon size={14} className="opacity-70" /> {f.label}
                                                 </span>
                                                 <span className="font-bold text-slate-800 dark:text-white">{count} <span className="text-xs text-slate-400 font-medium">({pct}%)</span></span>
                                             </div>
@@ -299,10 +303,10 @@ const DelegateDashboard = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-y sm:divide-y-0 divide-slate-100 dark:divide-slate-800">
                             {recentStudents.map((student) => {
                                 const filiereConfig = {
-                                    INFO: { label: 'INFO', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
-                                    INFOTRO: { label: 'INFOTRO', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' },
-                                    MECA: { label: 'MECA', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' },
-                                    GSIL: { label: 'GSIL', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' }
+                                    INFO: { label: 'INFO', icon: Laptop, color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
+                                    INFOTRO: { label: 'INFOTRO', icon: Cpu, color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' },
+                                    MECA: { label: 'MECA', icon: Settings, color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' },
+                                    GSIL: { label: 'GSIL', icon: Factory, color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' }
                                 };
                                 const promoConfig = {
                                     PREMIERE_ANNEE: '1A', DEUXIEME_ANNEE: '2A', TROISIEME_ANNEE: '3A'
@@ -327,7 +331,8 @@ const DelegateDashboard = () => {
                                             </p>
                                             <div className="flex items-center gap-1.5 mt-0.5">
                                                 {fil && (
-                                                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${fil.color}`}>
+                                                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold flex items-center gap-1 ${fil.color}`}>
+                                                        <fil.icon size={10} />
                                                         {fil.label}
                                                     </span>
                                                 )}

@@ -16,7 +16,11 @@ import {
     Loader2,
     AlertCircle,
     Eye,
-    EyeOff
+    EyeOff,
+    Laptop,
+    Cpu,
+    Settings as SettingsIcon,
+    Factory
 } from 'lucide-react';
 
 const SettingsPage = () => {
@@ -202,11 +206,11 @@ const SettingsPage = () => {
                                         <p className="text-sm text-slate-400 mt-0.5">{user?.email}</p>
                                         {user?.filiere && (
                                             <div className="flex items-center gap-2 mt-2 flex-wrap">
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400">
-                                                    {user.filiere === 'INFO' ? '💻 Informatique' :
-                                                     user.filiere === 'INFOTRO' ? '🔌 Infotronique' :
-                                                     user.filiere === 'MECA' ? '⚙️ Mécatronique' :
-                                                     user.filiere === 'GSIL' ? '🏭 GSIL' : user.filiere}
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400">
+                                                    {user.filiere === 'INFO' ? <><Laptop size={12} /> Informatique</> :
+                                                     user.filiere === 'INFOTRO' ? <><Cpu size={12} /> Infotronique</> :
+                                                     user.filiere === 'MECA' ? <><SettingsIcon size={12} /> Mécatronique</> :
+                                                     user.filiere === 'GSIL' ? <><Factory size={12} /> GSIL</> : user.filiere}
                                                 </span>
                                                 {user?.promotion && (
                                                     <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">

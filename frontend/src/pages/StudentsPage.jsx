@@ -11,15 +11,19 @@ import {
     X,
     UserCircle2,
     ArrowUpDown,
-    Download
+    Download,
+    Laptop,
+    Cpu,
+    Settings,
+    Factory
 } from 'lucide-react';
 import api from '../services/api';
 
 const FILIERE_CONFIG = {
-    INFO: { label: 'Informatique', icon: '💻', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', dotColor: 'bg-blue-500' },
-    INFOTRO: { label: 'Infotronique', icon: '🔌', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400', dotColor: 'bg-emerald-500' },
-    MECA: { label: 'Mécatronique', icon: '⚙️', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', dotColor: 'bg-orange-500' },
-    GSIL: { label: 'GSIL', icon: '🏭', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400', dotColor: 'bg-purple-500' }
+    INFO: { label: 'Informatique', icon: Laptop, color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', dotColor: 'bg-blue-500' },
+    INFOTRO: { label: 'Infotronique', icon: Cpu, color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400', dotColor: 'bg-emerald-500' },
+    MECA: { label: 'Mécatronique', icon: Settings, color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', dotColor: 'bg-orange-500' },
+    GSIL: { label: 'GSIL', icon: Factory, color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400', dotColor: 'bg-purple-500' }
 };
 
 const PROMOTION_CONFIG = {
@@ -106,7 +110,7 @@ const FilterDropdown = ({ label, icon: Icon, value, onChange, options, onClear }
             {open && (
                 <>
                     <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-                    <div className="absolute top-full left-0 mt-2 z-20 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xl py-1 min-w-[200px] animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="absolute top-full left-0 mt-2 z-20 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xl py-1 min-w-[200px] animate-in fade-in slide-in-from-top-2 duration-200">
                         {options.map(opt => (
                             <button
                                 key={opt.value}
@@ -117,7 +121,7 @@ const FilterDropdown = ({ label, icon: Icon, value, onChange, options, onClear }
                                         : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'
                                 }`}
                             >
-                                {opt.icon && <span>{opt.icon}</span>}
+                                {opt.icon && <opt.icon size={16} className="opacity-70" />}
                                 {opt.label}
                             </button>
                         ))}
@@ -225,7 +229,7 @@ const StudentsPage = () => {
 
     const filiereOptions = Object.entries(FILIERE_CONFIG).map(([key, config]) => ({
         value: key,
-        label: `${config.icon} ${config.label} (${filiereCounts[key] || 0})`,
+        label: config.label,
         icon: config.icon
     }));
 
@@ -273,14 +277,16 @@ const StudentsPage = () => {
                                 <button
                                     key={key}
                                     onClick={() => setFiliereFilter(filiereFilter === key ? '' : key)}
-                                    className={`text-center p-3 rounded-xl border-2 transition-all cursor-pointer ${
+                                    className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer ${
                                         filiereFilter === key
                                             ? 'border-primary-400 bg-primary-50 dark:bg-primary-900/20 dark:border-primary-600 scale-[1.02]'
                                             : 'border-transparent bg-slate-50 dark:bg-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700'
                                     }`}
                                 >
-                                    <div className="text-lg">{config.icon}</div>
-                                    <div className="text-xl font-black text-slate-800 dark:text-white mt-1">{filiereCounts[key] || 0}</div>
+                                    <div className={`p-2 rounded-lg mb-1 ${filiereFilter === key ? 'text-primary-600' : 'text-slate-400'}`}>
+                                        <config.icon size={20} />
+                                    </div>
+                                    <div className="text-xl font-black text-slate-800 dark:text-white">{filiereCounts[key] || 0}</div>
                                     <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-0.5">{config.label}</div>
                                 </button>
                             ))}
@@ -405,8 +411,8 @@ const StudentsPage = () => {
 
                                             <div className="w-28">
                                                 {filiereInfo ? (
-                                                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold ${filiereInfo.color}`}>
-                                                        <span>{filiereInfo.icon}</span>
+                                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold ${filiereInfo.color}`}>
+                                                        <filiereInfo.icon size={12} />
                                                         {filiereInfo.label}
                                                     </span>
                                                 ) : (
@@ -450,8 +456,8 @@ const StudentsPage = () => {
                                                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">@{student.username}</p>
                                                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">{student.email}</p>
                                                 {filiereInfo && (
-                                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold mt-2 ${filiereInfo.color}`}>
-                                                        <span>{filiereInfo.icon}</span>
+                                                    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold mt-2 ${filiereInfo.color}`}>
+                                                        <filiereInfo.icon size={10} />
                                                         {filiereInfo.label}
                                                     </span>
                                                 )}

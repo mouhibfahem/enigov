@@ -16,7 +16,11 @@ import {
     ChevronRight,
     LayoutGrid,
     List as ListIcon,
-    AlertCircle
+    AlertCircle,
+    BookOpen,
+    FileText,
+    Heart,
+    Settings
 } from 'lucide-react';
 
 const categoryColors = {
@@ -27,10 +31,17 @@ const categoryColors = {
 };
 
 const categoryLabels = {
-    'ACADEMIC': '📚 Académique',
-    'EXAM': '📝 Examen / DS',
-    'SOCIAL': '🤝 Vie Étudiante',
-    'ADMIN': '⚙️ Administratif'
+    'ACADEMIC': 'Académique',
+    'EXAM': 'Examen / DS',
+    'SOCIAL': 'Vie Étudiante',
+    'ADMIN': 'Administratif'
+};
+
+const categoryIcons = {
+    'ACADEMIC': BookOpen,
+    'EXAM': FileText,
+    'SOCIAL': Heart,
+    'ADMIN': Settings
 };
 
 const EventsPage = () => {
@@ -290,7 +301,8 @@ const EventsPage = () => {
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2 mb-1">
-                                                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${categoryColors[event.type] || 'bg-slate-600 text-white'}`}>
+                                                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider flex items-center gap-1 ${categoryColors[event.type] || 'bg-slate-600 text-white'}`}>
+                                                            {categoryIcons[event.type] && React.createElement(categoryIcons[event.type], { size: 10 })}
                                                             {categoryLabels[event.type] || 'Événement'}
                                                         </span>
                                                         <h3 className="text-lg font-black text-slate-800 dark:text-white">{event.title}</h3>
@@ -320,12 +332,18 @@ const EventsPage = () => {
 
                 {/* Legend */}
                 <div className="flex flex-wrap items-center justify-center gap-6 py-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800">
-                    {Object.entries(categoryLabels).map(([key, label]) => (
-                        <div key={key} className="flex items-center gap-2">
-                            <div className={`w-3 h-3 rounded-full ${categoryColors[key].split(' ')[0]}`} />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</span>
-                        </div>
-                    ))}
+                    {Object.entries(categoryLabels).map(([key, label]) => {
+                        const Icon = categoryIcons[key];
+                        return (
+                            <div key={key} className="flex items-center gap-2">
+                                <div className={`w-3 h-3 rounded-full ${categoryColors[key].split(' ')[0]}`} />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-1">
+                                    {Icon && <Icon size={10} className="opacity-60" />}
+                                    {label}
+                                </span>
+                            </div>
+                        );
+                    })}
                 </div>
 
                 {/* Form Modal */}
