@@ -11,10 +11,16 @@ import {
     ArrowRight,
     LogIn,
     UserPlus,
-    Crown,
     Globe,
     Shield,
-    Zap
+    Zap,
+    MapPin,
+    Phone,
+    Mail,
+    Facebook,
+    Linkedin,
+    Users,
+    Crown
 } from 'lucide-react';
 import Logo from '../components/Logo';
 
@@ -231,7 +237,7 @@ const LandingPage = () => {
 
             {/* Stats Section - Representing Governance */}
             <section id="gouvernance" className="py-32 border-y border-white/5 bg-white/[0.01] relative z-10">
-                <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-3 gap-16">
+                <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-3 gap-16 text-center">
                     {[
                         { label: 'Établissement', value: 'ENICarthage', icon: Globe },
                         { label: 'Engagement', value: '100% Digital', icon: Zap },
@@ -250,8 +256,119 @@ const LandingPage = () => {
                 </div>
             </section>
 
+            {/* Contact & Administration Section */}
+            <section id="contact" className="py-40 relative z-10 px-4">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
+                        {/* School Info */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            className="space-y-12"
+                        >
+                            <div>
+                                <div className="flex items-center gap-4 mb-4">
+                                    <div className="h-[2px] w-12 bg-primary-500" />
+                                    <span className="text-sm font-black tracking-widest text-primary-500 uppercase">Nous Contacter</span>
+                                </div>
+                                <h2 className="text-5xl font-black tracking-tighter mb-6">Local Principal.</h2>
+                                <p className="text-slate-400 text-lg leading-relaxed max-w-md">
+                                    L'ENICarthage est un établissement d'enseignement supérieur public, relevant de l'Université de Carthage, dédié à l'excellence technologique.
+                                </p>
+                            </div>
+
+                            <div className="space-y-8">
+                                <div className="flex items-start gap-5">
+                                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                                        <MapPin className="text-primary-500" size={24} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-white mb-1">Adresse</h4>
+                                        <p className="text-slate-400 text-sm leading-relaxed">
+                                            45 Rue des Entrepreneurs<br />
+                                            2035 Charguia II Tunis- Carthage-Tunisie
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-5">
+                                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                                        <Phone className="text-primary-500" size={24} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-white mb-1">Téléphone</h4>
+                                        <p className="text-slate-400 text-sm">
+                                            (+216) 71 941 579 / 71 940 699
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-5">
+                                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                                        <Mail className="text-primary-500" size={24} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-white mb-1">Email Officiel</h4>
+                                        <p className="text-slate-400 text-sm">
+                                            contact.enicarthage@enicar.ucar.tn
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Social Buttons */}
+                            <div className="flex gap-4 pt-4">
+                                <a href="https://www.facebook.com/ENICarthage.Tunisie" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-primary-500 transition-all text-slate-400 hover:text-white">
+                                    <Facebook size={24} />
+                                </a>
+                                <a href="https://www.linkedin.com/school/enicarthage/" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-primary-500 transition-all text-slate-400 hover:text-white">
+                                    <Linkedin size={24} />
+                                </a>
+                                <a href="http://www.enicarthage.rnu.tn/" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-primary-500 transition-all text-slate-400 hover:text-white">
+                                    <Globe size={24} />
+                                </a>
+                            </div>
+                        </motion.div>
+
+                        {/* Administration Info */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            className="bg-white/[0.03] border border-white/10 rounded-[3rem] p-10 md:p-12 relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 p-8 opacity-5">
+                                <Users size={120} />
+                            </div>
+                            
+                            <h3 className="text-3xl font-black mb-10 tracking-tight flex items-center gap-3">
+                                <Users className="text-primary-500" size={28} /> Administration
+                            </h3>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {[
+                                    { role: 'Directrice', name: 'Houda BEN ATTIA SETHOM', email: 'houda.benattia@enicar.ucar.tn' },
+                                    { role: 'Directrice des Études', name: 'Imen Kammoun', email: 'imen.kammoun@enicar.ucar.tn' },
+                                    { role: 'Directeur des Stages', name: 'Faouzi Jaidi', email: 'faouzi.jaidi@enicar.ucar.tn' },
+                                    { role: 'Directeur du Dép. Génie Électrique', name: 'Lotfi Bouslimi', email: 'lotfi.bouslimi@enicar.ucar.tn' },
+                                    { role: 'Directeur du Dép. Informatique', name: 'Houcem Hermassi', email: 'houcem.hermassi@enicar.ucar.tn' },
+                                    { role: 'Directeur du Dép. Génie Industriel', name: 'Basma Askri', email: 'basma.askri@enicar.ucar.tn' }
+                                ].map((admin, idx) => (
+                                    <div key={idx} className="group">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-primary-500 mb-1">{admin.role}</p>
+                                        <h5 className="font-bold text-white mb-1 group-hover:text-primary-400 transition-colors">{admin.name}</h5>
+                                        <a href={`mailto:${admin.email}`} className="text-xs text-slate-500 hover:text-white transition-colors truncate block">
+                                            {admin.email}
+                                        </a>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
             {/* Footer */}
-            <footer id="contact" className="pt-40 pb-20 px-4 relative z-10">
+            <footer className="pt-40 pb-20 px-4 relative z-10">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col items-center text-center">
                         <Logo textColor="text-white" />
@@ -262,18 +379,19 @@ const LandingPage = () => {
                             to="/register"
                             className="px-16 py-8 rounded-[2rem] bg-primary-600 text-white font-black text-2xl hover:bg-primary-700 transition-all shadow-[0_0_50px_rgba(79,70,229,0.3)]"
                         >
-                            REJOINDRE ENIGOV
+                            REJOINDRE UNIGOV
                         </Link>
                     </div>
 
                     <div className="mt-40 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
-                        <div className="flex gap-8 text-[10px] font-black tracking-[0.2em] text-slate-500">
-                            <a href="#" className="hover:text-white transition-colors">DATA PROTECTION</a>
-                            <a href="#" className="hover:text-white transition-colors">ACADEMIC RULES</a>
-                            <a href="#" className="hover:text-white transition-colors">SUPPORT</a>
+                        <div className="flex gap-8 text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase">
+                            <a href="http://www.enicarthage.rnu.tn/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Site Officiel</a>
+                            <a href="#" className="hover:text-white transition-colors">Academic Rules</a>
+                            <a href="mailto:contact.enicarthage@enicar.ucar.tn" className="hover:text-white transition-colors">Support</a>
                         </div>
-                        <div className="text-[10px] font-black tracking-[0.2em] text-slate-600 uppercase">
-                            © {new Date().getFullYear()} École Nationale d'Ingénieurs de Carthage
+                        <div className="text-[10px] font-black tracking-[0.2em] text-slate-600 uppercase text-center md:text-right">
+                            © {new Date().getFullYear()} École Nationale d'Ingénieurs de Carthage<br />
+                            <span className="text-slate-700">Developed for Excellence</span>
                         </div>
                     </div>
                 </div>
